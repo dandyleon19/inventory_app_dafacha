@@ -1,0 +1,152 @@
+name: Deploy
+
+on:
+  push:
+    branches:
+      - master
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-inventory-app
+  cancel-in-progress: true
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 11.6.0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build Nuxt
+        env:
+          NODE_ENV: production
+          NUXT_API_BASE: ${{ secrets.NUXT_API_BASE }}
+        run: pnpm run build
+
+      - name: Pack build artifact
+        run: tar -czf inventory-output.tar.gz .output
+
+      - name: Copy artifact to EC2
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          port: 22
+          source: inventory-output.tar.gz
+          target: /tmp
+
+      - name: Deploy on EC2
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          port: 22
+          script: |
+            set -e
+            APP_DIR="/var/www/inventory_app"
+            NEW_DIR="${APP_DIR}.new"
+            OLD_DIR="${APP_DIR}.old"
+            PM2_NAME="inventory_app"
+            PORT="${{ secrets.APP_PORT }}"
+            PORT="${PORT:-3003}"
+            DEPLOY_USER="$(whoami)"
+
+            # Extract into a fresh, separate directory first: never write into the live path
+            # while PM2 is still serving from it (half-overwritten files in flight).
+            sudo rm -rf "$NEW_DIR"
+            sudo mkdir -p "$NEW_DIR"
+            sudo chown -R "${DEPLOY_USER}:${DEPLOY_USER}" "$NEW_DIR"
+
+            cd "$NEW_DIR"
+            tar -xzf /tmp/inventory-output.tar.gz
+            rm -f /tmp/inventory-output.tar.gz
+
+            if [ ! -f "$NEW_DIR/.output/server/index.mjs" ]; then
+              echo "Build artifact missing: .output/server/index.mjs"
+              ls -la "$NEW_DIR" || true
+              exit 1
+            fi
+
+            # Atomic swap: the live path always points to either the fully old or the fully new
+            # build. The old release is kept until the health check passes, so a bad deploy rolls back.
+            sudo rm -rf "$OLD_DIR"
+            if [ -d "$APP_DIR" ]; then
+              sudo mv "$APP_DIR" "$OLD_DIR"
+            fi
+            sudo mv "$NEW_DIR" "$APP_DIR"
+            sudo chown -R "${DEPLOY_USER}:${DEPLOY_USER}" "$APP_DIR"
+
+            cd "$APP_DIR"
+
+            export NODE_ENV=production
+            export NUXT_API_BASE="${{ secrets.NUXT_API_BASE }}"
+            export HOST=127.0.0.1
+            export PORT="${PORT}"
+            export NITRO_PORT="${PORT}"
+            export NITRO_HOST=127.0.0.1
+
+            pm2 delete "$PM2_NAME" 2>/dev/null || true
+
+            pm2 start .output/server/index.mjs \
+              --name "$PM2_NAME" \
+              --cwd "$APP_DIR" \
+              --update-env
+
+            pm2 save
+
+            echo "Waiting for app on port ${PORT}..."
+            READY=0
+            for attempt in $(seq 1 20); do
+              HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" "http://127.0.0.1:${PORT}/" || echo "000")
+              echo "Attempt ${attempt}/20 -> HTTP ${HTTP_CODE}"
+
+              if [ "$HTTP_CODE" = "200" ] || [ "$HTTP_CODE" = "301" ] || [ "$HTTP_CODE" = "302" ] || [ "$HTTP_CODE" = "304" ]; then
+                READY=1
+                break
+              fi
+
+              sleep 2
+            done
+
+            if [ "$READY" -ne 1 ]; then
+              echo "App did not become ready on port ${PORT}"
+              ss -tlnp | grep -E "${PORT}|node" || true
+              pm2 status
+              pm2 describe "$PM2_NAME" || true
+              pm2 logs "$PM2_NAME" --lines 80 --nostream
+
+              if [ -d "$OLD_DIR" ]; then
+                echo "Rolling back to previous release"
+                sudo rm -rf "$APP_DIR"
+                sudo mv "$OLD_DIR" "$APP_DIR"
+                pm2 delete "$PM2_NAME" 2>/dev/null || true
+                pm2 start "$APP_DIR/.output/server/index.mjs" \
+                  --name "$PM2_NAME" \
+                  --cwd "$APP_DIR" \
+                  --update-env
+                pm2 save
+              fi
+
+              exit 1
+            fi
+
+            echo "Deploy successful on port ${PORT}"
+            sudo rm -rf "$OLD_DIR"
