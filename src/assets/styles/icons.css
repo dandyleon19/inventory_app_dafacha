@@ -1,0 +1,73 @@
+/* Keep Iconify icons aligned with Vuetify icon spacing and sizing */
+.v-icon .iconify,
+.v-icon.iconify {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  vertical-align: middle;
+  width: 1em;
+  height: 1em;
+  font-size: inherit;
+}
+
+.v-chip .v-icon,
+.v-chip .v-icon .iconify {
+  font-size: 0.95em;
+}
+
+.v-chip--size-small .v-icon,
+.v-chip--size-small .v-icon .iconify {
+  font-size: 0.875em;
+}
+
+.v-chip--size-x-small .v-icon,
+.v-chip--size-x-small .v-icon .iconify {
+  font-size: 0.8em;
+}
+
+.v-field__append-inner .v-icon,
+.v-field__prepend-inner .v-icon {
+  font-size: 1.25rem;
+}
+
+.v-data-table-footer .v-icon,
+.v-data-table-footer .v-icon .iconify {
+  font-size: 1.25rem;
+}
+
+.v-list-item__prepend .v-icon,
+.v-app-bar .v-icon,
+.v-app-bar .v-btn .v-icon {
+  font-size: 26px;
+}
+
+.v-icon.v-icon--size-x-small,
+.v-icon.v-icon--size-x-small .iconify {
+  font-size: 16px;
+}
+
+.v-icon.v-icon--size-small,
+.v-icon.v-icon--size-small .iconify {
+  font-size: 20px;
+}
+
+.v-icon.v-icon--size-large,
+.v-icon.v-icon--size-large .iconify {
+  font-size: 28px;
+}
+
+.v-icon.v-icon--size-x-large,
+.v-icon.v-icon--size-x-large .iconify {
+  font-size: 32px;
+}
+
+.v-icon.v-icon--start,
+.v-btn .v-icon--start {
+  margin-inline-end: 8px;
+}
+
+.v-icon.v-icon--end,
+.v-btn .v-icon--end {
+  margin-inline-start: 8px;
+}
