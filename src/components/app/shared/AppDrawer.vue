@@ -86,6 +86,20 @@ const emit = defineEmits<{
 
 const display = useDisplay()
 
+// While this panel is open the phone's bottom bar hides, so it never covers the panel's own buttons.
+const { opened, closed } = useOverlayState()
+watch(
+  () => props.modelValue,
+  (open, wasOpen) => {
+    if (open && !wasOpen) opened()
+    else if (!open && wasOpen) closed()
+  },
+  { immediate: true }
+)
+onBeforeUnmount(() => {
+  if (props.modelValue) closed()
+})
+
 const model = computed({
   get: () => props.modelValue,
   set: (val) => emit("update:modelValue", val),

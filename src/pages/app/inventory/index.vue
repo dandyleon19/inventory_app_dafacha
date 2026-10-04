@@ -12,7 +12,7 @@
           :color="action.color"
           variant="tonal"
           rounded="lg"
-          size="large"
+          :size="isMobile ? 'default' : 'large'"
           class="inventory-action"
           :prepend-icon="action.icon"
           @click="openOperation(action.kind)"
@@ -129,6 +129,7 @@ definePageMeta({ layout: "app" })
 
 useHead({ title: "Inventario" })
 
+const { isMobile } = useAppLayout()
 const authStore = useAuthStore()
 const stockStore = useStockStore()
 const warehousesStore = useWarehousesStore()

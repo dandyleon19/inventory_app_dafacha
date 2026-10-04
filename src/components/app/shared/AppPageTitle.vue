@@ -21,7 +21,7 @@
             </v-chip>
           </div>
 
-          <div v-if="$slots.actions" class="d-flex ga-2">
+          <div v-if="$slots.actions" class="app-page-title__actions d-flex flex-wrap ga-2">
             <slot name="actions" />
           </div>
         </div>
@@ -65,6 +65,22 @@ withDefaults(
 @media (max-width: 960px) {
   .app-page-title :deep(.v-card-text) {
     padding: 1.25rem !important;
+  }
+}
+
+/* Phones: the title takes a full row and the actions sit below it, each button sharing the width. */
+@media (max-width: 799px) {
+  .app-page-title h1 {
+    overflow-wrap: anywhere;
+  }
+
+  .app-page-title__actions {
+    width: 100%;
+  }
+
+  .app-page-title__actions :deep(.v-btn) {
+    flex: 1 1 auto;
+    min-width: 0;
   }
 }
 </style>

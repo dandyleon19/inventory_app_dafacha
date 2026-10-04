@@ -72,7 +72,7 @@ const iconColor = computed(() => config[notification.value.type].iconColor)
 
 <style scoped>
 .app-notification :deep(.v-snackbar__wrapper) {
-  min-width: 320px;
-  max-width: 480px;
+  min-width: min(320px, calc(100vw - 32px));
+  max-width: min(480px, calc(100vw - 32px));
 }
 </style>

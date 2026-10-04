@@ -597,6 +597,19 @@ const onSubmit = async () => {
   margin-bottom: 0.9rem;
 }
 
+/* The mode selectors (unidades / paquetes, por unidad / por paquete / total) share the width instead of overflowing it. */
+.po-line__block :deep(.v-btn-group) {
+  width: 100%;
+  max-width: 460px;
+}
+
+.po-line__block :deep(.v-btn-group .v-btn) {
+  flex: 1 1 0;
+  min-width: 0;
+  padding-inline: 8px;
+  font-size: 0.8rem;
+}
+
 .po-line__label {
   margin-bottom: 0.4rem;
   font-size: 0.8rem;
