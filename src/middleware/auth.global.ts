@@ -56,7 +56,12 @@ export default defineNuxtRouteMiddleware(async (to) => {
           role: payload.role,
           user,
         })
-      } catch {
+      } catch (error: any) {
+        // A company whose plan ended still has a valid session: it goes to the "subscription expired" page, not to login.
+        if (error?.status === 402 || error?.statusCode === 402) {
+          return to.path === "/app/subscription-expired" ? undefined : navigateTo("/app/subscription-expired")
+        }
+
         clearAuthTokens()
         authStore.logout()
         return navigateTo("/login")

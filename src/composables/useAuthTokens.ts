@@ -1,7 +1,9 @@
 import { useAuthStore } from "~/store/modules/auth"
 
-const ACCESS_TOKEN_COOKIE = "access_token"
-const REFRESH_TOKEN_COOKIE = "refresh_token"
+// Cookies are shared by every port of a host: with the same names, signing in to another app on localhost (salonspa)
+// replaced these tokens and this app was signed out. Each app keeps its own.
+const ACCESS_TOKEN_COOKIE = "inventory_access_token"
+const REFRESH_TOKEN_COOKIE = "inventory_refresh_token"
 
 const ACCESS_COOKIE_OPTIONS = {
   path: "/",
@@ -59,7 +61,7 @@ const syncAuthStoreToken = (token: string) => {
   })
 }
 
-const doRefresh = async (): Promise<boolean> => {
+const doRefresh = async (retried = false): Promise<boolean> => {
   const refreshToken = useCookie(REFRESH_TOKEN_COOKIE).value
   if (!refreshToken) return false
 
@@ -80,6 +82,10 @@ const doRefresh = async (): Promise<boolean> => {
     syncAuthStoreToken(data.token)
     return true
   } catch {
+    // The refresh token is used once: if another tab of this app refreshed first, ours is already spent but the
+    // new one is in the cookie. Try with that before giving up (giving up ends the session in every tab).
+    const latest = useCookie(REFRESH_TOKEN_COOKIE).value
+    if (!retried && latest && latest !== refreshToken) return doRefresh(true)
     return false
   }
 }
