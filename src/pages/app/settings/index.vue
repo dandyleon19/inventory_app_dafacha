@@ -293,7 +293,7 @@ import { validationRules as rules } from "~/helpers/validationFormRules"
 definePageMeta({
   layout: "app",
   middleware: "role",
-  allowedRoles: ["ADMIN_USER", "SUPER_ADMIN"],
+  allowedRoles: ["ADMIN_USER"],
 })
 
 useHead({ title: "Configuración" })

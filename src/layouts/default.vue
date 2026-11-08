@@ -17,7 +17,7 @@ useHead({
   position: relative;
   min-height: 100vh;
   min-height: 100dvh;
-  background: linear-gradient(180deg, #fff 0%, #f4f8f8 100%);
+  background: linear-gradient(180deg, #fff 0%, #f3f4f5 100%);
 }
 
 .default-layout__container {

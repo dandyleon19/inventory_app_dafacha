@@ -4,6 +4,7 @@
     subtitle="A quién le compras mercadería"
     :headers="headers"
     :row-options="rowOptions"
+    :show-create-button="canManage"
     :items="items"
     :chip-columns="chipColumns"
     :loading="suppliersStore.loading"
@@ -47,18 +48,21 @@
 import type { TableChipColumn, TableHeader, TableRowOption } from "~/interfaces/tableInterfaces"
 import type { Supplier, SupplierRequest } from "~/interfaces/supplierInterfaces"
 import { APP_ICONS } from "~/constants/appIcons"
-import { useSuppliersStore } from "~/store"
+import { useAuthStore, useSuppliersStore } from "~/store"
 import { areTableSearchEqual, normalizeTableSearch } from "~/helpers/tableSearchHelpers"
 
 definePageMeta({
   layout: "app",
   middleware: "role",
-  allowedRoles: ["ADMIN_USER", "SUPER_ADMIN", "PURCHASING_USER"],
+  allowedRoles: ["ADMIN_USER", "PURCHASING_USER", "VIEWER"],
 })
 
 useHead({ title: "Proveedores" })
 
 const suppliersStore = useSuppliersStore()
+const authStore = useAuthStore()
+// Admins and purchasing manage suppliers; the rest can only look at the list.
+const canManage = computed(() => authStore.canManagePurchases)
 const { notifyCreated, notifyUpdated, notifyDeleted, notifyError } = useApiNotification()
 
 const saving = ref(false)
@@ -72,7 +76,7 @@ const currentPage = ref(1)
 const itemsPerPage = ref(10)
 const activeSearch = ref("")
 
-const headers: TableHeader[] = [
+const headers = computed<TableHeader[]>(() => [
   { title: "#", key: "id" },
   { title: "Proveedor", key: "name" },
   { title: "RUC", key: "rucNumber" },
@@ -80,17 +84,21 @@ const headers: TableHeader[] = [
   { title: "Teléfono", key: "phone" },
   { title: "Correo", key: "email" },
   { title: "Estado", key: "statusLabel" },
-  { title: "Acciones", key: "actions", sortable: false },
-]
+  ...(canManage.value ? [{ title: "Acciones", key: "actions", sortable: false }] : []),
+])
 
 const chipColumns: TableChipColumn[] = [
   { key: "statusLabel", color: (item) => (item.isActive ? "success" : "error") },
 ]
 
-const rowOptions: TableRowOption[] = [
-  { action: "update", color: "primary", icon: APP_ICONS.edit },
-  { action: "delete", color: "error", icon: APP_ICONS.delete },
-]
+const rowOptions = computed<TableRowOption[]>(() =>
+  canManage.value
+    ? [
+        { action: "update", color: "primary", icon: APP_ICONS.edit },
+        { action: "delete", color: "error", icon: APP_ICONS.delete },
+      ]
+    : []
+)
 
 const items = computed(() =>
   (suppliersStore.data?.content ?? []).map((supplier) => ({

@@ -1,25 +1,44 @@
 :root {
-  --color-primary: #1F6F78; /* Teal principal (provisional) */
-  --color-primary-light: #7FB5BA;
+  --color-primary: #00A19B; /* Verde Petronas (Mercedes F1) */
+  --color-primary-light: #5CD6CF;
   --color-background: #FFFFFF;
-  --color-surface: #F5F5F5;
+  --color-surface: #FFFFFF;
 
   --color-text: #212121;
   --color-text-secondary: #9E9E9E;
 
-  --color-success: #81C784;
-  --color-warning: #FB8C00;
-  --color-info: #4FC3F7;
-  --color-error: #E57373;
+  --color-success: #1B8556;
+  --color-warning: #F2B100;
+  --color-info: #1F78C1;
+  --color-error: #D32F2F;
 
-  --navbar-bg: var(--color-primary);
-  --sidebar-bg: #212121;
+  --navbar-bg: #0E0E10;
+  --sidebar-bg: #0B0B0C;
   --sidebar-text: #FFFFFF;
+
+  /*
+   * "Ink" = the dark version of each state color, used when the color is the TEXT (or a small icon) on white or on
+   * a tinted chip. The bright fills fail contrast as text (amber is 1.8:1 on white); each ink is 5:1 or better.
+   */
+  --ink-primary: #00706B;
+  --ink-success: #14724A;
+  --ink-warning: #7A5200;
+  --ink-info: #17679A;
+  --ink-error: #B3261E;
+
+  /* Page canvas behind the white cards, and the shadow scale used by cards, menus and dialogs. */
+  --app-canvas: #F1F2F3; /* plata muy suave */
+  --app-border: rgba(33, 33, 33, 0.09);
+  --shadow-card: 0 1px 2px rgba(11, 11, 12, 0.04), 0 8px 24px rgba(11, 11, 12, 0.05);
+  --shadow-card-hover: 0 2px 4px rgba(11, 11, 12, 0.05), 0 14px 32px rgba(11, 11, 12, 0.09);
+  --shadow-pop: 0 4px 8px rgba(11, 11, 12, 0.06), 0 18px 44px rgba(11, 11, 12, 0.16);
+  --radius-card: 20px;
+  --radius-control: 12px;
 }
 
 /* Botones outlined/text visibles sobre fondos claros */
 .v-btn.v-btn--variant-outlined {
-  color: rgb(var(--v-theme-primary)) !important;
+  color: var(--ink-primary) !important;
   border-color: rgba(var(--v-theme-primary), 0.45) !important;
   background: rgb(var(--v-theme-surface)) !important;
 }
@@ -35,7 +54,7 @@
 
 .v-btn.v-btn--variant-flat.bg-primary,
 .v-btn.v-btn--variant-flat.text-primary {
-  color: #fff !important;
+  color: rgb(var(--v-theme-on-primary)) !important;
 }
 
 /* Formularios */
@@ -81,7 +100,7 @@
 }
 
 .app-form-btn--primary {
-  color: #fff !important;
+  color: rgb(var(--v-theme-on-primary)) !important;
   text-transform: none;
   letter-spacing: normal;
   min-width: 140px;

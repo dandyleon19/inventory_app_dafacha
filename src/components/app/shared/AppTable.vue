@@ -42,6 +42,9 @@
             elevation="0"
         >
             <div class="app-table__toolbar">
+                <div v-if="$slots.summary" class="app-table__summary">
+                    <slot name="summary" />
+                </div>
                 <div class="app-table__toolbar-inner">
                     <v-text-field
                         v-if="showSearch"
@@ -545,7 +548,7 @@ watch(selectedFilters, (val) => {
 
 <style scoped>
 .app-table__btn-primary {
-    color: #fff !important;
+    color: #14110F !important;
     text-transform: none;
     letter-spacing: normal;
     box-shadow: 0 4px 14px rgba(var(--v-theme-primary), 0.28);
@@ -554,18 +557,18 @@ watch(selectedFilters, (val) => {
 .app-table__btn-export {
     text-transform: none;
     letter-spacing: normal;
-    color: rgb(var(--v-theme-primary)) !important;
+    color: var(--ink-primary) !important;
     background: rgba(var(--v-theme-primary), 0.08) !important;
     border: 1px solid rgba(var(--v-theme-primary), 0.18) !important;
 }
 
 .app-table__btn-export :deep(.v-btn__content),
 .app-table__btn-export :deep(.v-icon) {
-    color: rgb(var(--v-theme-primary)) !important;
+    color: var(--ink-primary) !important;
 }
 
 .app-table {
-    border: 1px solid rgba(var(--v-border-color), 0.55);
+    border: 1px solid rgba(var(--v-border-color), 0.12);
     overflow: hidden;
     background: rgb(var(--v-theme-background));
     width: 100%;
@@ -582,7 +585,18 @@ watch(selectedFilters, (val) => {
             rgba(var(--v-theme-primary), 0.045) 0%,
             rgba(var(--v-theme-background), 1) 100%
         );
-    border-bottom: 1px solid rgba(var(--v-border-color), 0.45);
+    border-bottom: 1px solid rgba(var(--v-border-color), 0.1);
+}
+
+/* Optional row above the search with quick filters / counts (slot "summary"). */
+.app-table__summary {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.875rem;
+    padding-bottom: 0.875rem;
+    border-bottom: 1px dashed rgba(var(--v-border-color), 0.12);
 }
 
 .app-table__toolbar-inner {
@@ -772,7 +786,7 @@ watch(selectedFilters, (val) => {
 .app-table__search :deep(.v-field),
 .app-table__filter :deep(.v-field) {
     background: rgba(var(--v-theme-surface), 0.65) !important;
-    box-shadow: inset 0 0 0 1px rgba(var(--v-border-color), 0.55);
+    box-shadow: inset 0 0 0 1px rgba(var(--v-border-color), 0.14);
     transition: box-shadow 0.2s ease, background-color 0.2s ease;
 }
 
@@ -798,7 +812,7 @@ watch(selectedFilters, (val) => {
 }
 
 .app-table__empty-cell {
-    color: rgba(var(--v-theme-on-surface), 0.42);
+    color: rgba(var(--v-theme-on-surface), 0.62);
 }
 
 .app-table__actions {
@@ -819,10 +833,10 @@ watch(selectedFilters, (val) => {
     flex-shrink: 0;
     width: 2.125rem;
     height: 2.125rem;
-    border: 1px solid rgba(var(--v-border-color), 0.65);
+    border: 1px solid rgba(var(--v-border-color), 0.14);
     border-radius: 0.75rem;
     background: rgba(var(--v-theme-surface), 0.55);
-    color: rgba(var(--v-theme-on-surface), 0.62);
+    color: rgba(var(--v-theme-on-surface), 0.72);
     cursor: pointer;
     transition:
         transform 0.15s ease,
@@ -840,50 +854,50 @@ watch(selectedFilters, (val) => {
 }
 
 .app-table__action--primary {
-    color: rgb(var(--v-theme-primary));
+    color: var(--ink-primary);
     border-color: rgba(var(--v-theme-primary), 0.18);
     background: rgba(var(--v-theme-primary), 0.08);
 }
 
 .app-table__action--primary:hover {
     background: rgba(var(--v-theme-primary), 0.14);
-    color: rgb(var(--v-theme-primary));
+    color: var(--ink-primary);
     border-color: rgba(var(--v-theme-primary), 0.28);
 }
 
 .app-table__action--error {
-    color: rgb(var(--v-theme-error));
+    color: var(--ink-error);
     border-color: rgba(var(--v-theme-error), 0.18);
     background: rgba(var(--v-theme-error), 0.08);
 }
 
 .app-table__action--error:hover {
     background: rgba(var(--v-theme-error), 0.14);
-    color: rgb(var(--v-theme-error));
+    color: var(--ink-error);
     border-color: rgba(var(--v-theme-error), 0.28);
 }
 
 .app-table__action--warning {
-    color: rgb(var(--v-theme-warning));
+    color: var(--ink-warning);
     border-color: rgba(var(--v-theme-warning), 0.18);
     background: rgba(var(--v-theme-warning), 0.08);
 }
 
 .app-table__action--warning:hover {
     background: rgba(var(--v-theme-warning), 0.14);
-    color: rgb(var(--v-theme-warning));
+    color: var(--ink-warning);
     border-color: rgba(var(--v-theme-warning), 0.28);
 }
 
 .app-table__action--success {
-    color: rgb(var(--v-theme-success));
+    color: var(--ink-success);
     border-color: rgba(var(--v-theme-success), 0.18);
     background: rgba(var(--v-theme-success), 0.08);
 }
 
 .app-table__action--success:hover {
     background: rgba(var(--v-theme-success), 0.14);
-    color: rgb(var(--v-theme-success));
+    color: var(--ink-success);
     border-color: rgba(var(--v-theme-success), 0.28);
 }
 
@@ -917,7 +931,7 @@ watch(selectedFilters, (val) => {
     margin-bottom: 0.875rem;
     border-radius: 1rem;
     background: rgba(var(--v-theme-primary), 0.1);
-    color: rgb(var(--v-theme-primary));
+    color: var(--ink-primary);
 }
 
 .app-table__state-icon--muted {
@@ -936,19 +950,19 @@ watch(selectedFilters, (val) => {
 
 .app-table__data :deep(.v-data-table__thead th) {
     background: transparent !important;
-    color: rgba(var(--v-theme-on-surface), 0.58) !important;
+    color: rgba(var(--v-theme-on-surface), 0.70) !important;
     font-size: 0.6875rem !important;
     font-weight: 700 !important;
     letter-spacing: 0.08em;
     text-transform: uppercase;
-    border-bottom: 1px solid rgba(var(--v-border-color), 0.55) !important;
+    border-bottom: 1px solid rgba(var(--v-border-color), 0.12) !important;
     height: 3rem !important;
     padding-top: 0.75rem !important;
     padding-bottom: 0.75rem !important;
 }
 
 .app-table__data :deep(.v-data-table__tbody td) {
-    border-bottom: 1px solid rgba(var(--v-border-color), 0.32) !important;
+    border-bottom: 1px solid rgba(var(--v-border-color), 0.08) !important;
     padding-top: 0.875rem !important;
     padding-bottom: 0.875rem !important;
     font-size: 0.875rem;
@@ -974,7 +988,7 @@ watch(selectedFilters, (val) => {
 }
 
 .app-table__data :deep(.v-data-table-footer) {
-    border-top: 1px solid rgba(var(--v-border-color), 0.55);
+    border-top: 1px solid rgba(var(--v-border-color), 0.12);
     padding-inline: 1.25rem;
     padding-block: 0.75rem;
     font-size: 0.8125rem;
@@ -986,13 +1000,13 @@ watch(selectedFilters, (val) => {
 }
 
 .app-table__data :deep(.v-pagination .v-btn) {
-    color: rgba(var(--v-theme-on-surface), 0.68) !important;
+    color: rgba(var(--v-theme-on-surface), 0.72) !important;
     border-radius: 0.75rem;
 }
 
 .app-table__data :deep(.v-pagination__item--is-active .v-btn) {
     background: rgba(var(--v-theme-primary), 0.14) !important;
-    color: rgb(var(--v-theme-primary)) !important;
+    color: var(--ink-primary) !important;
     box-shadow: inset 0 0 0 1px rgba(var(--v-theme-primary), 0.18);
 }
 
@@ -1025,5 +1039,16 @@ watch(selectedFilters, (val) => {
     .app-table__data :deep(.v-data-table-footer__pagination) {
         justify-content: center;
     }
+}
+
+/* The first data column is the record's name (client, user, branch...): a touch stronger than the rest. */
+.app-table__data :deep(.v-data-table__tbody td:nth-child(2)) {
+    font-weight: 600;
+    color: rgba(var(--v-theme-on-surface), 0.94);
+}
+
+/* Money and counts keep their digits aligned. */
+.app-table__data :deep(.v-data-table__tbody td) {
+    font-variant-numeric: tabular-nums;
 }
 </style>

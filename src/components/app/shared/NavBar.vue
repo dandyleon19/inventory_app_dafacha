@@ -1,5 +1,5 @@
 <template>
-  <v-app-bar color="navbar" :elevation="2" rounded="0">
+  <v-app-bar color="navbar" class="app-navbar" :elevation="0" rounded="0">
     <template #prepend>
       <v-app-bar-nav-icon
         v-if="isMobile"
@@ -22,7 +22,7 @@
     </v-app-bar-title>
 
     <template #append>
-      <AlertsMenu />
+      <AlertsMenu v-if="!authStore.isSuperAdmin" />
 
       <v-menu location="bottom end" offset="8">
         <template #activator="{ props: menuProps }">
@@ -113,7 +113,25 @@ const handleLogout = async () => {
 </script>
 
 <style scoped>
+/* Carbon black bar with a thin line in the brand color along its bottom edge. */
+.app-navbar {
+  background-image: linear-gradient(100deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0) 60%);
+  box-shadow:
+    inset 0 -2px 0 rgb(var(--v-theme-primary)),
+    0 8px 22px rgba(0, 0, 0, 0.28);
+}
+
+/* Everything printed on the black bar is white (the global rule for text buttons would make it dark gray). */
+.app-navbar :deep(.v-btn.v-btn--variant-text),
+.app-navbar :deep(.v-btn.v-btn--variant-text .v-icon),
+.app-navbar :deep(.v-app-bar-title) {
+  color: #fff !important;
+}
+
 .app-navbar__title {
+  font-family: var(--font-heading);
+  font-weight: 600;
+  letter-spacing: -0.01em;
   font-size: clamp(0.95rem, 2.5vw, 1.25rem);
 }
 

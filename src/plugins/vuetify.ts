@@ -11,18 +11,32 @@ export default defineNuxtPlugin(nuxtApp => {
   const inventoryLightTheme = {
     dark: false,
     colors: {
-      primary: '#1F6F78',
-      'primary-light': '#7FB5BA',
+      // Petronas green on black and silver (Mercedes F1). Green is the action color; black frames the app.
+      primary: '#00A19B',
+      'primary-light': '#5CD6CF',
       background: '#FFFFFF',
-      surface: '#F5F5F5',
+      // Cards and panels are white; the page behind them is a soft tinted canvas (--app-canvas).
+      surface: '#FFFFFF',
       text: '#212121',
       'text-secondary': '#9E9E9E',
-      success: '#81C784',
-      warning: '#FB8C00',
-      info: '#4FC3F7',
-      error: '#E57373',
-      navbar: '#1F6F78',
-      sidebar: '#212121',
+      // State fills are deep enough for WHITE text (4.5:1 or better); amber is too light for white, so its text
+      // is near-black. The "on-*" colors below are what buttons, chips and alerts print on each fill.
+      success: '#1B8556',
+      warning: '#F2B100',
+      info: '#1F78C1',
+      error: '#D32F2F',
+      // Petronas green is bright: its text is near-black (white on it is only 3:1).
+      'on-primary': '#0B0B0C',
+      'on-warning': '#14110F',
+      'on-success': '#FFFFFF',
+      'on-info': '#FFFFFF',
+      'on-error': '#FFFFFF',
+      navbar: '#0E0E10',
+      sidebar: '#0B0B0C',
+    },
+    variables: {
+      // Secondary text ("text-medium-emphasis", subtitles) was 60% black = 4.3:1; 72% is 6:1.
+      'medium-emphasis-opacity': 0.72,
     },
   }
 

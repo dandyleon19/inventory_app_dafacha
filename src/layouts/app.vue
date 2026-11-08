@@ -4,6 +4,7 @@
 
     <v-main class="app-layout-main">
       <NavBar />
+      <SubscriptionBanner />
       <v-container class="app-layout-container" fluid>
         <slot />
       </v-container>
@@ -31,7 +32,7 @@ useHead({
 
 <style scoped>
 .app-layout-main {
-  background: rgb(var(--v-theme-surface));
+  background: var(--app-canvas);
   /* A flex/grid child with long content can't shrink below it unless told it may: that is what pushes pages sideways. */
   min-width: 0;
 }
@@ -39,8 +40,8 @@ useHead({
 .app-layout-container {
   width: 100%;
   max-width: 100%;
-  padding-top: 8px;
-  padding-bottom: 24px;
+  padding-top: 16px;
+  padding-bottom: 32px;
   /* Safety net: whatever a page does, the page itself never scrolls sideways (tables and code scroll inside their own box). */
   overflow-x: clip;
 }

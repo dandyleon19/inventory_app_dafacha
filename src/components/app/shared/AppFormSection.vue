@@ -52,7 +52,7 @@ defineProps<{
   margin: 0.35rem 0 0;
   font-size: 0.8125rem;
   line-height: 1.45;
-  color: rgba(var(--v-theme-on-surface), 0.62);
+  color: rgba(var(--v-theme-on-surface), 0.72);
 }
 
 .app-form-section__content {

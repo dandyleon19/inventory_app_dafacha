@@ -89,3 +89,15 @@ export const todayIso = (): string => {
   const pad = (n: number) => String(n).padStart(2, "0")
   return `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`
 }
+
+/** A date as "5 nov, 2026" (a time part is ignored). Read at noon so no timezone moves it to another day. */
+export const formatDateDisplay = (value?: string | null): string => {
+  if (!value) return ""
+
+  const datePart = value.includes("T") ? value.split("T")[0] : value
+  const parsed = new Date(`${datePart}T12:00:00`)
+  if (Number.isNaN(parsed.getTime())) return value
+
+  const month = parsed.toLocaleDateString("es-PE", { month: "short" }).replace(/\.$/, "")
+  return `${parsed.getDate()} ${month}, ${parsed.getFullYear()}`
+}

@@ -45,7 +45,7 @@ useHead({ title: "Iniciar sesión" })
   border: 1px solid rgba(var(--v-border-color), var(--v-border-opacity));
   background: rgba(255, 255, 255, 0.94);
   backdrop-filter: blur(12px);
-  box-shadow: 0 18px 48px rgba(31, 111, 120, 0.1);
+  box-shadow: 0 18px 48px rgba(0, 161, 155, 0.1);
 }
 
 .login-page__body {
@@ -81,13 +81,13 @@ useHead({ title: "Iniciar sesión" })
   margin: 0;
   font-size: 0.9375rem;
   line-height: 1.5;
-  color: rgba(var(--v-theme-on-surface), 0.58);
+  color: rgba(var(--v-theme-on-surface), 0.70);
 }
 
 .login-page__footer {
   margin: 1.25rem 0 0;
   text-align: center;
   font-size: 0.8125rem;
-  color: rgba(var(--v-theme-on-surface), 0.45);
+  color: rgba(var(--v-theme-on-surface), 0.62);
 }
 </style>

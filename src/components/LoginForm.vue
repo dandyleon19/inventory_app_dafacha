@@ -154,13 +154,13 @@ const handleLogin = async () => {
 }
 
 .login-form__submit {
-  color: #fff !important;
+  color: rgb(var(--v-theme-on-primary)) !important;
   text-transform: none;
   letter-spacing: normal;
   font-weight: 600;
   min-height: 48px;
   margin-top: 0.75rem !important;
-  box-shadow: 0 10px 24px rgba(31, 111, 120, 0.24);
+  box-shadow: 0 10px 24px rgba(0, 161, 155, 0.24);
 }
 
 .login-form__overlay {

@@ -33,8 +33,10 @@
         v-for="item in filteredItems"
         :key="item.to"
         :prepend-icon="item.icon"
+        :append-icon="isLocked(item) ? APP_ICONS.lock : undefined"
         :title="item.title"
         :value="item.title"
+        :class="{ 'app-sidebar__item--locked': isLocked(item) }"
         link
         :to="item.to"
         rounded="lg"
@@ -64,10 +66,13 @@
 <script setup lang="ts">
 import { APP_ICONS } from "~/constants/appIcons"
 import logoDf from "~/assets/img/logo-df-icon.png"
+import { useSubscriptionStore } from "~/store/modules/subscription"
+import type { FeatureKey } from "~/interfaces/subscriptionInterfaces"
 import { useAuthStore } from "~/store/modules/auth"
 import { useAppLayout } from "~/composables/useAppLayout"
 
 const authStore = useAuthStore()
+const subscriptionStore = useSubscriptionStore()
 const { drawerOpen, sidebarRail, isMobile, toggleDrawer, handleNavClick } = useAppLayout()
 
 const isRail = computed(() => !isMobile.value && sidebarRail.value)
@@ -77,54 +82,67 @@ interface SidebarItem {
   icon: string
   to: string
   onlyFor?: string[]
+  /** The platform owner (SUPER_ADMIN) sees only the items marked like this; everybody else never sees them. */
+  platform?: boolean
+  /** Plan feature the page needs; without it the item stays in the menu with a lock. */
+  feature?: FeatureKey
 }
 
 // One entry per module; add `onlyFor: ["ADMIN_USER", ...]` to restrict by role.
 const items: SidebarItem[] = [
-  { title: "Dashboard", icon: APP_ICONS.dashboard, to: "/app" },
+  { title: "Dashboard", icon: APP_ICONS.dashboard, to: "/app", platform: true },
   { title: "Inventario", icon: APP_ICONS.stock, to: "/app/inventory" },
   { title: "Vencimientos", icon: APP_ICONS.expiry, to: "/app/expirations" },
   { title: "Movimientos", icon: APP_ICONS.movements, to: "/app/stock-movements" },
-  { title: "Órdenes de compra", icon: APP_ICONS.purchaseOrder, to: "/app/purchase-orders" },
-  { title: "Recepciones", icon: APP_ICONS.receive, to: "/app/receipts" },
+  { title: "Órdenes de compra", icon: APP_ICONS.purchaseOrder, to: "/app/purchase-orders", feature: "purchase_orders" },
+  { title: "Recepciones", icon: APP_ICONS.receive, to: "/app/receipts", feature: "purchase_orders" },
   { title: "Productos", icon: APP_ICONS.package, to: "/app/products" },
   {
     title: "Categorías",
     icon: APP_ICONS.tags,
     to: "/app/product-categories",
-    onlyFor: ["ADMIN_USER", "SUPER_ADMIN"],
+    onlyFor: ["ADMIN_USER"],
   },
   {
     title: "Proveedores",
     icon: APP_ICONS.truckDelivery,
     to: "/app/suppliers",
-    onlyFor: ["ADMIN_USER", "SUPER_ADMIN", "PURCHASING_USER"],
+    onlyFor: ["ADMIN_USER", "PURCHASING_USER", "VIEWER"],
+    feature: "purchase_orders",
   },
   {
     title: "Almacenes",
     icon: APP_ICONS.warehouse,
     to: "/app/warehouses",
-    onlyFor: ["ADMIN_USER", "SUPER_ADMIN"],
+    onlyFor: ["ADMIN_USER"],
   },
   {
     title: "Usuarios",
     icon: APP_ICONS.users,
     to: "/app/users",
-    onlyFor: ["ADMIN_USER", "SUPER_ADMIN"],
+    onlyFor: ["ADMIN_USER"],
   },
   {
     title: "Auditoría",
     icon: APP_ICONS.audit,
     to: "/app/audit",
-    onlyFor: ["ADMIN_USER", "SUPER_ADMIN"],
+    onlyFor: ["ADMIN_USER"],
+    feature: "audit_log",
   },
+  { title: "Empresas", icon: APP_ICONS.building, to: "/app/companies", onlyFor: ["SUPER_ADMIN"], platform: true },
 ]
 
+// A feature the company's plan does not include stays in the menu with a lock: clicking it explains why.
+const isLocked = (item: SidebarItem) =>
+  !!item.feature && !authStore.isSuperAdmin && !subscriptionStore.hasFeature(item.feature)
+
 // Settings sit in their own block at the bottom of the sidebar, apart from the module links.
-const canManageSettings = computed(() => authStore.canManage)
+const canManageSettings = computed(() => authStore.isAdmin)
 
 const filteredItems = computed(() =>
-  items.filter((item) => !item.onlyFor || item.onlyFor.includes(authStore.role as string))
+  authStore.isSuperAdmin
+    ? items.filter((item) => item.platform)
+    : items.filter((item) => !item.onlyFor || item.onlyFor.includes(authStore.role as string))
 )
 
 const prefetchSidebarRoute = (to: string) => {
@@ -190,8 +208,44 @@ const prefetchSidebarRoute = (to: string) => {
   opacity: 0.82;
 }
 
+.app-sidebar :deep(.v-list-item) {
+  min-height: 42px;
+  margin-bottom: 3px;
+  color: rgba(255, 255, 255, 0.78);
+}
+
+.app-sidebar :deep(.v-list-item:hover) {
+  background: rgba(255, 255, 255, 0.07);
+  color: #fff;
+}
+
+.app-sidebar :deep(.v-list-item-title) {
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+/* Current page: brand tint, a bar on the left edge, white text and a brand-color icon. */
 .app-sidebar :deep(.v-list-item--active) {
-  background: rgba(255, 255, 255, 0.1);
+  background: linear-gradient(90deg, rgba(var(--v-theme-primary), 0.26) 0%, rgba(255, 255, 255, 0.03) 100%);
+  box-shadow: inset 3px 0 0 rgb(var(--v-theme-primary));
+  color: #fff;
+}
+
+.app-sidebar :deep(.v-list-item--active .v-list-item-title) {
+  font-weight: 600;
+}
+
+.app-sidebar :deep(.v-list-item--active .v-list-item__prepend > .v-icon) {
+  color: rgb(var(--v-theme-primary));
+}
+
+.app-sidebar :deep(.v-list-item__overlay) {
+  display: none;
+}
+
+.app-sidebar :deep(.v-divider) {
+  border-color: rgba(255, 255, 255, 0.08);
+  opacity: 1;
 }
 
 .app-sidebar :deep(.v-navigation-drawer__content) {
@@ -203,5 +257,10 @@ const prefetchSidebarRoute = (to: string) => {
   color: rgba(255, 255, 255, 0.82);
   opacity: 1;
   margin-inline-end: 8px;
+}
+
+.app-sidebar__item--locked :deep(.v-list-item-title),
+.app-sidebar__item--locked :deep(.v-list-item__prepend) {
+  opacity: 0.68;
 }
 </style>

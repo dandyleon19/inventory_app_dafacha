@@ -49,7 +49,9 @@ h6,
 }
 
 .v-application .v-btn {
-  letter-spacing: 0.02em;
+  letter-spacing: 0.01em;
+  text-transform: none;
+  font-weight: 600;
 }
 
 .app-font-heading {

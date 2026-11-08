@@ -1,4 +1,5 @@
 import { useAuthStore } from "~/store/modules/auth"
+import { useSubscriptionStore } from "~/store/modules/subscription"
 import {
   clearAuthTokens,
   getAccessToken,
@@ -24,6 +25,15 @@ export default defineNuxtPlugin(() => {
       }
     },
     async onResponseError({ request, response, options }) {
+      // 402: the company's trial / payment is over (or it was suspended). Show the "subscription expired" page.
+      if (response.status === 402 && response._data?.code === "SUBSCRIPTION_INACTIVE") {
+        await useSubscriptionStore().markBlocked()
+        if (import.meta.client) {
+          await navigateTo("/app/subscription-expired")
+        }
+        return
+      }
+
       if (response.status !== 401) return
 
       const url = request.toString()

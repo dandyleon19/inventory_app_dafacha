@@ -46,7 +46,7 @@ import { usePurchaseOrdersStore, useSuppliersStore, useWarehousesStore } from "~
 definePageMeta({
   layout: "app",
   middleware: "role",
-  allowedRoles: ["ADMIN_USER", "SUPER_ADMIN", "PURCHASING_USER"],
+  allowedRoles: ["ADMIN_USER", "PURCHASING_USER"],
 })
 
 useHead({ title: "Nueva orden de compra" })

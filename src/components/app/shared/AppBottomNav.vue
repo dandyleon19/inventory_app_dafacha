@@ -35,6 +35,7 @@
 <script setup lang="ts">
 import { APP_ICONS } from "~/constants/appIcons"
 import { useAppLayout } from "~/composables/useAppLayout"
+import { useAuthStore } from "~/store/modules/auth"
 import { useOverlayState } from "~/composables/useOverlayState"
 
 interface QuickItem {
@@ -46,12 +47,21 @@ interface QuickItem {
 }
 
 // The most used pages, open to every role (the rest stay in the sidebar). Change the list here to change the bar.
-const items: QuickItem[] = [
+const companyItems: QuickItem[] = [
   { title: "Inicio", icon: APP_ICONS.dashboard, to: "/app", exact: true },
   { title: "Inventario", icon: APP_ICONS.stock, to: "/app/inventory" },
   { title: "Órdenes", icon: APP_ICONS.purchaseOrder, to: "/app/purchase-orders" },
   { title: "Productos", icon: APP_ICONS.package, to: "/app/products" },
 ]
+
+// The platform owner only has the platform pages.
+const platformItems: QuickItem[] = [
+  { title: "Inicio", icon: APP_ICONS.dashboard, to: "/app", exact: true },
+  { title: "Empresas", icon: APP_ICONS.building, to: "/app/companies" },
+]
+
+const authStore = useAuthStore()
+const items = computed(() => (authStore.isSuperAdmin ? platformItems : companyItems))
 
 const route = useRoute()
 const { drawerOpen, toggleDrawer } = useAppLayout()
@@ -61,7 +71,7 @@ const isCurrent = (item: QuickItem) =>
   route.path === item.to || (!item.exact && route.path.startsWith(`${item.to}/`))
 
 /** The quick page the user is on; when it is a page that lives only in the sidebar, "Más" is the one highlighted. */
-const activeValue = computed(() => items.find(isCurrent)?.to ?? "more")
+const activeValue = computed(() => items.value.find(isCurrent)?.to ?? "more")
 
 // Out of the way while the sidebar or a form panel is open: they cover the same area.
 const visible = computed(() => !drawerOpen.value && !anyOpen.value)

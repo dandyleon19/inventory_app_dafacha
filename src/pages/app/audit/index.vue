@@ -45,7 +45,7 @@ import { formatDateTime } from "~/helpers/formatHelpers"
 definePageMeta({
   layout: "app",
   middleware: "role",
-  allowedRoles: ["ADMIN_USER", "SUPER_ADMIN"],
+  allowedRoles: ["ADMIN_USER"],
 })
 
 useHead({ title: "Auditoría" })

@@ -158,10 +158,10 @@ watch(model, (val) => {
 
 .confirm-modal__btn--cancel {
   background: rgba(var(--v-theme-primary), 0.08) !important;
-  color: rgb(var(--v-theme-primary)) !important;
+  color: var(--ink-primary) !important;
 }
 
 .confirm-modal__btn--confirm {
-  color: #fff !important;
+  color: rgb(var(--v-theme-on-error)) !important;
 }
 </style>

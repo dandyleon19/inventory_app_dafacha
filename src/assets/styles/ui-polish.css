@@ -1,0 +1,271 @@
+/*
+ * Visual polish shared by the whole app: page canvas, card depth, menus, dialogs, form controls,
+ * scrollbars and focus. Colors come from the Vuetify theme (plugins/vuetify.ts) and the tokens in variables.css,
+ * so a change of palette needs no edit here.
+ */
+
+html {
+  background: var(--app-canvas);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+::selection {
+  background: rgba(var(--v-theme-primary), 0.2);
+}
+
+/* ------------------------------------------------------------------ Cards and panels */
+
+/*
+ * Same soft shadow on every page card (the ones with rounded="xl" elevation="0" that are not inside another card).
+ * Vuetify applies elevation-0 with !important, so this has to as well.
+ */
+.app-layout-container .v-card.rounded-xl.elevation-0:not(.v-card .v-card),
+.v-card.dashboard-stat-card,
+.v-card.dashboard-panel,
+.v-card.app-table {
+  box-shadow: var(--shadow-card) !important;
+  transition:
+    box-shadow 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.v-card.dashboard-stat-card--link:hover {
+  box-shadow: var(--shadow-card-hover) !important;
+  transform: translateY(-2px);
+}
+
+/* A soft glow in the corner of the page header card (title + actions) and the dashboards' welcome card. */
+.app-page-title,
+.dashboard-welcome {
+  position: relative;
+  overflow: hidden;
+}
+
+.app-page-title::after,
+.dashboard-welcome::after {
+  content: "";
+  position: absolute;
+  top: -90px;
+  right: -70px;
+  width: 260px;
+  height: 260px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(var(--v-theme-primary), 0.13) 0%, rgba(var(--v-theme-primary), 0) 70%);
+  pointer-events: none;
+}
+
+.app-page-title > .v-card-text,
+.dashboard-welcome > .v-card-text {
+  position: relative;
+  z-index: 1;
+}
+
+/* ------------------------------------------------------------------ Numbers */
+
+/* Digits of the same width so columns of money and counts line up. */
+.v-data-table td,
+.dashboard-stat-card__value,
+.dashboard-low-stock-item,
+.app-table__row-num {
+  font-variant-numeric: tabular-nums;
+}
+
+/* ------------------------------------------------------------------ Chips and buttons */
+
+.v-chip.v-chip--variant-tonal {
+  font-weight: 600;
+}
+
+.v-chip.v-chip--size-small {
+  font-size: 0.75rem;
+}
+
+/* ------------------------------------------------------------------ Text contrast */
+
+/*
+ * A state color used as TEXT (a tonal chip, a "text-success" label, a tonal alert or button) is printed in its dark
+ * "ink" (variables.css). The bright fill would read at 1.8 to 3.3:1 on white; the inks are 5:1 or better.
+ * Filled elements (bg-*) are not touched: they use the matching "on-*" color from the theme.
+ */
+.v-application .text-primary,
+.v-application .v-chip.text-primary,
+.v-application .v-btn.v-btn--variant-tonal.text-primary,
+.v-application .v-alert.v-alert--variant-tonal.text-primary {
+  color: var(--ink-primary) !important;
+}
+
+.v-application .text-success,
+.v-application .v-chip.text-success,
+.v-application .v-btn.v-btn--variant-tonal.text-success,
+.v-application .v-alert.v-alert--variant-tonal.text-success {
+  color: var(--ink-success) !important;
+}
+
+.v-application .text-warning,
+.v-application .v-chip.text-warning,
+.v-application .v-btn.v-btn--variant-tonal.text-warning,
+.v-application .v-alert.v-alert--variant-tonal.text-warning {
+  color: var(--ink-warning) !important;
+}
+
+.v-application .text-info,
+.v-application .v-chip.text-info,
+.v-application .v-btn.v-btn--variant-tonal.text-info,
+.v-application .v-alert.v-alert--variant-tonal.text-info {
+  color: var(--ink-info) !important;
+}
+
+.v-application .text-error,
+.v-application .v-chip.text-error,
+.v-application .v-btn.v-btn--variant-tonal.text-error,
+.v-application .v-alert.v-alert--variant-tonal.text-error {
+  color: var(--ink-error) !important;
+}
+
+/* The label of a focused field and the selected tab are orange text on white: use the ink. */
+.v-field.v-field--focused:not(.v-field--error) .v-label.v-field-label,
+.v-tab.v-tab--selected {
+  color: var(--ink-primary) !important;
+  opacity: 1;
+}
+
+/* A filled button never keeps white text on orange or amber. */
+.v-btn.v-btn--variant-flat.bg-warning {
+  color: rgb(var(--v-theme-on-warning)) !important;
+}
+
+/*
+ * A disabled flat button is washed out with a layer of the text color. The text on orange is near-black, so
+ * that layer must be white or the button turns brown instead of a faded orange.
+ */
+.v-btn.v-btn--variant-flat.v-btn--disabled .v-btn__overlay {
+  background-color: #fff;
+}
+
+.v-btn.v-btn--variant-flat:not(.v-btn--icon) {
+  transition:
+    box-shadow 0.2s ease,
+    transform 0.15s ease,
+    filter 0.2s ease;
+}
+
+.v-btn.v-btn--variant-flat:not(.v-btn--icon):not(.v-btn--disabled):hover {
+  filter: brightness(1.04);
+}
+
+.v-btn.v-btn--variant-flat:not(.v-btn--icon):not(.v-btn--disabled):active {
+  transform: translateY(1px);
+}
+
+/* ------------------------------------------------------------------ Menus, dialogs, tooltips */
+
+.v-menu > .v-overlay__content > .v-list,
+.v-menu > .v-overlay__content > .v-card,
+.v-select__content > .v-list,
+.v-autocomplete__content > .v-list {
+  border: 1px solid var(--app-border);
+  border-radius: 14px;
+  box-shadow: var(--shadow-pop);
+}
+
+.v-dialog > .v-overlay__content > .v-card {
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-pop);
+}
+
+.v-list-item {
+  transition: background-color 0.15s ease;
+}
+
+.v-tooltip > .v-overlay__content {
+  border-radius: 8px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  padding: 6px 10px;
+  background: rgba(11, 11, 12, 0.94);
+}
+
+.v-alert {
+  border-radius: 14px;
+}
+
+.v-snackbar__wrapper,
+.v-snackbar .v-snackbar__wrapper {
+  border-radius: 14px;
+}
+
+/* ------------------------------------------------------------------ Form controls */
+
+.app-form .v-field,
+.app-table__search .v-field,
+.app-table__filter .v-field,
+.dashboard__filter .v-field {
+  border-radius: var(--radius-control);
+}
+
+.v-field--variant-outlined.v-field--focused .v-field__outline {
+  --v-field-border-opacity: 0.7;
+}
+
+.v-label.v-field-label {
+  font-weight: 500;
+}
+
+/* ------------------------------------------------------------------ Drawers (forms on the side) */
+
+.app-form-drawer {
+  box-shadow: var(--shadow-pop) !important;
+  border-left: 1px solid var(--app-border);
+}
+
+.app-form-drawer__header {
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--app-border);
+}
+
+/* ------------------------------------------------------------------ Scrollbars and focus */
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(33, 33, 33, 0.22) transparent;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(33, 33, 33, 0.2);
+  border-radius: 10px;
+  border: 3px solid transparent;
+  background-clip: content-box;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(33, 33, 33, 0.35);
+  background-clip: content-box;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.v-btn:focus-visible,
+.v-list-item:focus-visible,
+a:focus-visible {
+  outline: 2px solid rgba(var(--v-theme-primary), 0.55);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
+}

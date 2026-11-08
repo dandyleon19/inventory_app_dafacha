@@ -7,7 +7,7 @@
 <style scoped>
 .app-table-wrapper {
   width: 100%;
-  max-width: 1280px;
+  max-width: 1360px;
   margin-inline: auto;
   min-width: 0;
 }

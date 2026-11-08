@@ -1,6 +1,13 @@
 import type { PurchaseOrder } from "~/interfaces/purchaseOrderInterfaces"
 import type { StockLot, StockMovement, StockSummary, WarehouseValuation } from "~/interfaces/stockInterfaces"
 
+/** What left the warehouses on one day, valued at cost. */
+export interface DailyOutflow {
+  date: string
+  value: number
+  movements: number
+}
+
 /** GET /api/dashboard: valuation, alert counters and short lists, in one response. */
 export interface DashboardSummary {
   totalValue: number
@@ -22,4 +29,6 @@ export interface DashboardSummary {
   expiringLots: StockLot[]
   arrivingOrders: PurchaseOrder[]
   recentMovements: StockMovement[]
+  /** Last 30 days; days without exits are missing. */
+  outflowByDay: DailyOutflow[]
 }
