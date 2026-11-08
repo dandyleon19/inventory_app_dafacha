@@ -24,12 +24,12 @@
 
 <script setup lang="ts">
 /**
- * Select for a list that can be long (suppliers, product categories). It never loads them all: it shows the first
+ * Select for a list that can be long (suppliers, product categories, companies). It never loads them all: it shows the first
  * 20, loads the next 20 each time the user scrolls to the end, and searches on the server as the user types (so any
  * record can be found). `v-model` is the record's id; `select` hands the parent the whole record once it is known,
  * also when the id was set from code.
  */
-type Kind = "supplier" | "category"
+type Kind = "supplier" | "category" | "company"
 
 interface RemoteRecord {
   id: number | string
@@ -61,6 +61,7 @@ const { autocomplete } = useFormFields()
 const ENDPOINTS: Record<Kind, string> = {
   supplier: "/api/suppliers",
   category: "/api/product-categories",
+  company: "/api/companies",
 }
 const PAGE_SIZE = 20
 const SEARCH_DELAY_MS = 300

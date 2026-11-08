@@ -18,7 +18,7 @@ export const useWarehousesStore = defineStore('warehouses', {
     },
 
     actions: {
-        async fetchWarehouses(page = 0, size = 10, search = "") {
+        async fetchWarehouses(page = 0, size = 10, search = "", companyId?: number) {
             this.loading = true
             try {
                 const { $api } = useNuxtApp()
@@ -28,6 +28,8 @@ export const useWarehousesStore = defineStore('warehouses', {
                 if (normalizedSearch) {
                     query.search = normalizedSearch
                 }
+                // Only the platform owner filters by company; for everybody else the server ignores it.
+                if (companyId) query.companyId = companyId
 
                 this.data = await $api<PageResponse<Warehouse>>('/api/warehouses', { method: 'GET', query })
             } catch (err) {

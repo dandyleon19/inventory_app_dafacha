@@ -91,6 +91,7 @@ interface SidebarItem {
 // One entry per module; add `onlyFor: ["ADMIN_USER", ...]` to restrict by role.
 const items: SidebarItem[] = [
   { title: "Dashboard", icon: APP_ICONS.dashboard, to: "/app", platform: true },
+  { title: "Empresas", icon: APP_ICONS.building, to: "/app/companies", onlyFor: ["SUPER_ADMIN"], platform: true },
   { title: "Inventario", icon: APP_ICONS.stock, to: "/app/inventory" },
   { title: "Vencimientos", icon: APP_ICONS.expiry, to: "/app/expirations" },
   { title: "Movimientos", icon: APP_ICONS.movements, to: "/app/stock-movements" },
@@ -115,12 +116,14 @@ const items: SidebarItem[] = [
     icon: APP_ICONS.warehouse,
     to: "/app/warehouses",
     onlyFor: ["ADMIN_USER"],
+    platform: true,
   },
   {
     title: "Usuarios",
     icon: APP_ICONS.users,
     to: "/app/users",
     onlyFor: ["ADMIN_USER"],
+    platform: true,
   },
   {
     title: "Auditoría",
@@ -129,7 +132,6 @@ const items: SidebarItem[] = [
     onlyFor: ["ADMIN_USER"],
     feature: "audit_log",
   },
-  { title: "Empresas", icon: APP_ICONS.building, to: "/app/companies", onlyFor: ["SUPER_ADMIN"], platform: true },
 ]
 
 // A feature the company's plan does not include stays in the menu with a lock: clicking it explains why.

@@ -73,10 +73,14 @@ const { logout } = useAuth()
 const { isMobile, sidebarRail, toggleDrawer, toggleRail } = useAppLayout()
 
 // The bell's counters: loaded with the layout and refreshed on navigation (throttled in the store).
+// The platform owner has no company of their own, so there is nothing to count (and no bell).
 const route = useRoute()
 const dashboardStore = useDashboardStore()
-onMounted(() => dashboardStore.fetchSummary())
-watch(() => route.fullPath, () => dashboardStore.fetchSummary())
+const loadAlerts = () => {
+  if (!authStore.isSuperAdmin) dashboardStore.fetchSummary()
+}
+onMounted(loadAlerts)
+watch(() => route.fullPath, loadAlerts)
 
 const userName = computed(() => {
   const user = authStore.user

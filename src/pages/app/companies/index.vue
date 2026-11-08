@@ -95,6 +95,7 @@ import {
 } from "~/interfaces/subscriptionInterfaces"
 import type { CompanyAdminRequest } from "~/store/modules/companyAdmin"
 import { formatDateDisplay } from "~/helpers/formatHelpers"
+import { describeLastSession } from "~/helpers/lastSessionHelpers"
 import { areTableSearchEqual, normalizeTableSearch } from "~/helpers/tableSearchHelpers"
 import { APP_ICONS } from "~/constants/appIcons"
 import { useCompanyAdminStore } from "~/store/modules/companyAdmin"
@@ -134,6 +135,8 @@ const headers: TableHeader[] = [
   { title: "Plan", key: "planName" },
   { title: "Estado", key: "subscriptionStatusLabel" },
   { title: "Vence", key: "subscriptionEnd" },
+  { title: "Última sesión", key: "lastSessionLabel" },
+  { title: "Último en entrar", key: "lastSessionByLabel" },
   { title: "Acciones", key: "actions", sortable: false },
 ]
 
@@ -148,6 +151,7 @@ const chipColumns: TableChipColumn[] = [
     key: "subscriptionStatusLabel",
     color: (item) => SUBSCRIPTION_STATUS_COLORS[item.subscriptionStatus as SubscriptionStatus] ?? "default",
   },
+  { key: "lastSessionLabel", color: (item) => item.lastSessionTone ?? "default" },
 ]
 
 // Summary chips above the table: how many companies are in each state (all of them, not only this page).
@@ -209,6 +213,9 @@ const items = computed(() =>
     .filter(({ subscription }) => matchesFilter(subscription, statusFilter.value))
     .map(({ company, subscription }) => ({
       ...company,
+      lastSessionLabel: describeLastSession(company.lastSessionAt).label,
+      lastSessionTone: describeLastSession(company.lastSessionAt).tone,
+      lastSessionByLabel: company.lastSessionBy || "—",
       planName: subscription?.planName ?? "—",
       subscriptionStatus: subscription?.status,
       subscriptionStatusLabel: subscription ? subscriptionStatusText(subscription) : "",

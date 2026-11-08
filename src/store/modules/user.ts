@@ -11,6 +11,8 @@ export interface UserListParams {
     search?: string
     role?: UserRole
     isActive?: boolean
+    /** Only the platform owner (SUPER_ADMIN) uses it: to see one company's users instead of everybody's. */
+    companyId?: number
 }
 
 export const useUsersStore = defineStore('users', {
@@ -35,6 +37,7 @@ export const useUsersStore = defineStore('users', {
                 if (search) query.search = search
                 if (params.role) query.role = params.role
                 if (params.isActive !== undefined) query.isActive = params.isActive
+                if (params.companyId) query.companyId = params.companyId
 
                 this.data = await $api<PageResponse<User>>('/api/users', { method: 'GET', query })
             } catch (err) {

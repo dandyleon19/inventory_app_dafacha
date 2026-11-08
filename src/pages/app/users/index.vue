@@ -32,6 +32,7 @@
   >
     <UserForm
       :action="formAction"
+      :key="`${formAction}-${selectedUser?.id ?? 'new'}`"
       :user="selectedUser"
       :warehouses="warehousesStore.activeOptions"
       @submit="handleSubmit"
@@ -54,11 +55,12 @@ import { APP_ICONS } from "~/constants/appIcons"
 import { useAuthStore, useUsersStore, useWarehousesStore } from "~/store"
 import { areTableSearchEqual, normalizeTableSearch } from "~/helpers/tableSearchHelpers"
 import { formatDateOnly } from "~/helpers/formatHelpers"
+import { describeLastSession } from "~/helpers/lastSessionHelpers"
 
 definePageMeta({
   layout: "app",
   middleware: "role",
-  allowedRoles: ["ADMIN_USER"],
+  allowedRoles: ["ADMIN_USER", "SUPER_ADMIN"],
 })
 
 useHead({ title: "Usuarios" })
@@ -79,21 +81,25 @@ const resettingPassword = ref(false)
 const currentPage = ref(1)
 const itemsPerPage = ref(10)
 const activeSearch = ref("")
-const activeFilters = reactive<{ role?: UserRole; isActive?: boolean }>({})
+const activeFilters = reactive<{ role?: UserRole; isActive?: boolean; companyId?: number }>({})
 
-const headers: TableHeader[] = [
+// The platform owner sees the users of every company, so for them the list says which company each one is from.
+const headers = computed<TableHeader[]>(() => [
   { title: "Usuario", key: "fullName" },
   { title: "Correo", key: "email" },
+  ...(authStore.isSuperAdmin ? [{ title: "Empresa", key: "companyLabel" }] : []),
   { title: "Rol", key: "roleLabel" },
   { title: "Almacenes", key: "warehousesLabel" },
   { title: "Estado", key: "statusLabel" },
+  { title: "Última sesión", key: "lastLoginLabel" },
   { title: "Desde", key: "createdLabel" },
   { title: "Acciones", key: "actions", sortable: false },
-]
+])
 
 const chipColumns: TableChipColumn[] = [
   { key: "roleLabel", color: (item) => USER_ROLE_COLORS[item.role as UserRole] ?? "default" },
   { key: "statusLabel", color: (item) => (item.isActive ? "success" : "error") },
+  { key: "lastLoginLabel", color: (item) => item.lastLoginTone ?? "default" },
 ]
 
 const rowOptions: TableRowOption[] = [
@@ -106,6 +112,10 @@ const getRowOptions = (user: Record<string, unknown>): TableRowOption[] =>
   user.role === "SUPER_ADMIN" && !authStore.isSuperAdmin ? [] : rowOptions
 
 const tableFilters = computed<FilterOption[]>(() => [
+  // Only the platform owner works across companies, so only they can narrow the list down to one.
+  ...(authStore.isSuperAdmin
+    ? [{ type: "remote-select" as const, label: "Empresa", key: "companyId", kind: "company" as const, items: [] }]
+    : []),
   { type: "select", label: "Rol", key: "role", items: USER_ROLE_OPTIONS },
   {
     type: "select",
@@ -133,6 +143,9 @@ const items = computed(() =>
     roleLabel: getUserRoleLabel(user.role),
     warehousesLabel: warehouseNames(user),
     statusLabel: user.isActive ? "Activo" : "Inactivo",
+    companyLabel: user.companyName || "—",
+    lastLoginLabel: describeLastSession(user.lastLoginAt).label,
+    lastLoginTone: describeLastSession(user.lastLoginAt).tone,
     createdLabel: user.createdAt ? formatDateOnly(user.createdAt.slice(0, 10)) : "—",
   }))
 )
@@ -145,6 +158,7 @@ const fetchUsers = () =>
     search: activeSearch.value,
     role: activeFilters.role,
     isActive: activeFilters.isActive,
+    companyId: activeFilters.companyId,
   })
 
 const handleApplySearch = (value: string) => {
@@ -159,6 +173,7 @@ const handleApplySearch = (value: string) => {
 const handleUpdateFilters = (values: Record<string, any>) => {
   activeFilters.role = values.role ?? undefined
   activeFilters.isActive = values.isActive ?? undefined
+  activeFilters.companyId = values.companyId ?? undefined
   currentPage.value = 1
   fetchUsers()
 }

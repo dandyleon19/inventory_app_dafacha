@@ -5,6 +5,9 @@ export interface Company {
   fiscalAddress?: string | null
   rucNumber?: string | null
   phone?: string | null
+  /** Only for the platform owner: the company's most recent session (null = never) and whose it was. */
+  lastSessionAt?: string | null
+  lastSessionBy?: string | null
 }
 
 /** Body for PUT /api/company. */

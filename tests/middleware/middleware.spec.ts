@@ -60,8 +60,8 @@ describe("role middleware", () => {
   })
 })
 
-describe("platform middleware (SUPER_ADMIN only has the dashboard and the companies)", () => {
-  it.each(["/app", "/app/", "/app/companies", "/app/companies/"])("lets SUPER_ADMIN into %s", (path) => {
+describe("platform middleware (SUPER_ADMIN has the dashboard, the companies, and everyone's users and warehouses)", () => {
+  it.each(["/app", "/app/", "/app/companies", "/app/companies/", "/app/users", "/app/warehouses"])("lets SUPER_ADMIN into %s", (path) => {
     signIn("SUPER_ADMIN")
     expect(run(platformMiddleware, route(path))).toBeUndefined()
     expect(navigateToMock).not.toHaveBeenCalled()
@@ -70,8 +70,8 @@ describe("platform middleware (SUPER_ADMIN only has the dashboard and the compan
   it.each([
     "/app/inventory",
     "/app/products",
-    "/app/users",
     "/app/suppliers",
+    "/app/audit",
     "/app/purchase-orders",
     "/app/settings",
     "/app/companies/5",

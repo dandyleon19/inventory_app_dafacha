@@ -7,6 +7,16 @@
   >
     <AppFormSection title="Datos del usuario" subtitle="Quién es y cómo entra al sistema">
       <v-row dense>
+        <!-- Only the platform owner creates users for other companies, so only they choose the company. The admin
+             of a company always creates in their own (the server decides it), and a user never changes company. -->
+        <v-col v-if="chooseCompany" cols="12">
+          <RemoteSelect
+            v-model="form.companyId"
+            kind="company"
+            label="Empresa"
+            :rules="[rules.required]"
+          />
+        </v-col>
         <v-col cols="12" sm="6">
           <v-text-field
             v-model="form.firstName"
@@ -79,14 +89,15 @@
           <v-autocomplete
             v-model="form.warehouseIds"
             v-bind="autocomplete"
-            :items="warehouses"
+            :items="warehouseItems"
             item-title="name"
             item-value="id"
             label="Almacenes permitidos"
             multiple
             chips
             closable-chips
-            no-data-text="Sin almacenes"
+            :loading="loadingWarehouses"
+            :no-data-text="chooseCompany && !form.companyId ? 'Elige primero la empresa' : 'Sin almacenes'"
             :rules="[atLeastOneWarehouse]"
           />
         </v-col>
@@ -156,7 +167,51 @@ const form = reactive({
   role: (props.user?.role ?? "WAREHOUSE_USER") as UserRole,
   isActive: props.user?.isActive ?? true,
   warehouseIds: [...(props.user?.warehouseIds ?? [])] as number[],
+  companyId: null as number | string | null,
 })
+
+// The platform owner picks the company when creating; when editing they work on the company the user already has.
+const chooseCompany = computed(() => authStore.isSuperAdmin && props.action === "create")
+
+// An admin lists their own company's warehouses (handed in by the page). The platform owner works across companies,
+// so the list is the one of the company the user belongs to, loaded when it is chosen.
+const ownerWarehouses = ref<Warehouse[]>([])
+const loadingWarehouses = ref(false)
+const warehouseItems = computed(() => (authStore.isSuperAdmin ? ownerWarehouses.value : props.warehouses))
+
+const currentCompanyId = () => (props.action === "create" ? form.companyId : props.user?.companyId)
+
+const loadOwnerWarehouses = async (companyId: number | string | null | undefined) => {
+  ownerWarehouses.value = []
+  if (!companyId) return
+
+  loadingWarehouses.value = true
+  try {
+    const { $api } = useNuxtApp()
+    const response = await $api<{ content?: Warehouse[] }>("/api/warehouses", {
+      method: "GET",
+      query: { companyId, isActive: true, page: 0, size: 100 },
+    })
+    if (String(currentCompanyId() ?? "") !== String(companyId)) return // the choice changed meanwhile
+    ownerWarehouses.value = response?.content ?? []
+  } catch (err) {
+    console.error("Error al obtener los almacenes de la empresa:", err)
+  } finally {
+    loadingWarehouses.value = false
+  }
+}
+
+if (authStore.isSuperAdmin) {
+  watch(
+    currentCompanyId,
+    (companyId, previous) => {
+      // A different company has different warehouses: what was picked for the previous one no longer applies.
+      if (previous !== undefined && props.action === "create") form.warehouseIds = []
+      loadOwnerWarehouses(companyId)
+    },
+    { immediate: true }
+  )
+}
 
 // No warehouses stored = all of them.
 const allWarehouses = ref((props.user?.warehouseIds?.length ?? 0) === 0)
@@ -204,6 +259,7 @@ const onSubmit = async () => {
     role: form.role,
     isActive: form.isActive,
     warehouseIds: isAdminRole.value || allWarehouses.value ? [] : form.warehouseIds,
+    ...(chooseCompany.value ? { companyId: Number(form.companyId) } : {}),
   })
 }
 </script>

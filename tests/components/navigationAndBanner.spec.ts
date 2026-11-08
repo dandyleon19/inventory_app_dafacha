@@ -58,9 +58,9 @@ describe("sidebar menu per role", () => {
     "Auditoría",
   ]
 
-  it("SUPER_ADMIN sees only the platform: dashboard and companies", async () => {
+  it("SUPER_ADMIN sees only the platform: dashboard, companies, and everyone's warehouses and users", async () => {
     signIn("SUPER_ADMIN")
-    expect(await menuTitles()).toEqual(["Dashboard", "Empresas"])
+    expect(await menuTitles()).toEqual(["Dashboard", "Empresas", "Almacenes", "Usuarios"])
   })
 
   it("ADMIN_USER sees the whole company menu, with settings, and not the platform items", async () => {

@@ -17,6 +17,8 @@ export interface User {
   companyName?: string
   /** The warehouses the user is limited to; empty means all of them. */
   warehouseIds?: number[]
+  /** When the user last signed in or renewed their session (null = never). */
+  lastLoginAt?: string | null
   createdAt?: string
 }
 
@@ -29,6 +31,8 @@ export interface UserRequest {
   role: UserRole
   isActive: boolean
   warehouseIds: number[]
+  /** Only the platform owner (SUPER_ADMIN) sends it, when creating: the company the user belongs to. */
+  companyId?: number
 }
 
 export const USER_ROLE_LABELS: Record<UserRole, string> = {

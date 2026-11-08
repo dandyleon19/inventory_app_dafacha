@@ -5,6 +5,7 @@
     :headers="headers"
     :row-options="rowOptions"
     :items="items"
+    :filters="tableFilters"
     :chip-columns="chipColumns"
     :loading="warehousesStore.loading"
     :page="currentPage"
@@ -16,6 +17,7 @@
     @handle-create-button="handleCreateButton"
     @handle-row-action-button="handleRowActionButton"
     @handle-update-search="handleApplySearch"
+    @handle-update-filters="handleUpdateFilters"
   />
 
   <AppDrawer
@@ -28,6 +30,7 @@
     @close="closeDrawer"
   >
     <WarehouseForm
+      :key="`${formAction}-${selectedWarehouse?.id ?? 'new'}`"
       :action="formAction"
       :warehouse="selectedWarehouse"
       @submit="handleSubmit"
@@ -44,20 +47,21 @@
 </template>
 
 <script setup lang="ts">
-import type { TableChipColumn, TableHeader, TableRowOption } from "~/interfaces/tableInterfaces"
+import type { FilterOption, TableChipColumn, TableHeader, TableRowOption } from "~/interfaces/tableInterfaces"
 import type { Warehouse, WarehouseRequest } from "~/interfaces/warehouseInterfaces"
 import { APP_ICONS } from "~/constants/appIcons"
-import { useWarehousesStore } from "~/store"
+import { useAuthStore, useWarehousesStore } from "~/store"
 import { areTableSearchEqual, normalizeTableSearch } from "~/helpers/tableSearchHelpers"
 
 definePageMeta({
   layout: "app",
   middleware: "role",
-  allowedRoles: ["ADMIN_USER"],
+  allowedRoles: ["ADMIN_USER", "SUPER_ADMIN"],
 })
 
 useHead({ title: "Almacenes" })
 
+const authStore = useAuthStore()
 const warehousesStore = useWarehousesStore()
 const { notifyCreated, notifyUpdated, notifyDeleted, notifyError } = useApiNotification()
 
@@ -71,14 +75,24 @@ const warehouseToRemove = ref<Warehouse | null>(null)
 const currentPage = ref(1)
 const itemsPerPage = ref(10)
 const activeSearch = ref("")
+const activeCompanyId = ref<number | undefined>(undefined)
 
-const headers: TableHeader[] = [
+// The platform owner sees the warehouses of every company, so for them the list says which company each one is from.
+const headers = computed<TableHeader[]>(() => [
   { title: "#", key: "id" },
+  ...(authStore.isSuperAdmin ? [{ title: "Empresa", key: "companyLabel" }] : []),
   { title: "Nombre", key: "name" },
   { title: "Dirección", key: "address" },
   { title: "Estado", key: "statusLabel" },
   { title: "Acciones", key: "actions", sortable: false },
-]
+])
+
+// Only the platform owner works across companies, so only they can narrow the list down to one.
+const tableFilters = computed<FilterOption[]>(() =>
+  authStore.isSuperAdmin
+    ? [{ type: "remote-select", label: "Empresa", key: "companyId", kind: "company", items: [] }]
+    : []
+)
 
 const chipColumns: TableChipColumn[] = [
   { key: "statusLabel", color: (item) => (item.isActive ? "success" : "error") },
@@ -92,13 +106,20 @@ const rowOptions: TableRowOption[] = [
 const items = computed(() =>
   (warehousesStore.data?.content ?? []).map((warehouse) => ({
     ...warehouse,
+    companyLabel: warehouse.companyName || "—",
     statusLabel: warehouse.isActive ? "Activo" : "Inactivo",
   }))
 )
 const totalItems = computed(() => warehousesStore.data?.totalElements ?? 0)
 
 const fetchWarehouses = () =>
-  warehousesStore.fetchWarehouses(currentPage.value - 1, itemsPerPage.value, activeSearch.value)
+  warehousesStore.fetchWarehouses(currentPage.value - 1, itemsPerPage.value, activeSearch.value, activeCompanyId.value)
+
+const handleUpdateFilters = (values: Record<string, any>) => {
+  activeCompanyId.value = values.companyId ?? undefined
+  currentPage.value = 1
+  fetchWarehouses()
+}
 
 const handleApplySearch = (value: string) => {
   const next = normalizeTableSearch(value)

@@ -58,6 +58,8 @@ const companyItems: QuickItem[] = [
 const platformItems: QuickItem[] = [
   { title: "Inicio", icon: APP_ICONS.dashboard, to: "/app", exact: true },
   { title: "Empresas", icon: APP_ICONS.building, to: "/app/companies" },
+  { title: "Almacenes", icon: APP_ICONS.warehouse, to: "/app/warehouses" },
+  { title: "Usuarios", icon: APP_ICONS.users, to: "/app/users" },
 ]
 
 const authStore = useAuthStore()

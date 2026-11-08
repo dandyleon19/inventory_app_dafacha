@@ -20,7 +20,7 @@ export interface FilterOption {
     items: Array<any>
     multiple?: boolean
     /** remote-select: what is listed, searched on the server and loaded 20 at a time. */
-    kind?: "supplier" | "category"
+    kind?: "supplier" | "category" | "company"
     /** remote-select: extra filters sent to the server. */
     query?: Record<string, string | number | boolean>
 }
