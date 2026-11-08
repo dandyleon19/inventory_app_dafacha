@@ -130,7 +130,6 @@
         <v-card-text class="pa-5 pa-md-6">
           <PurchaseOrderForm
             :order="order"
-            :suppliers="editableSuppliers"
             :warehouses="warehousesStore.activeOptions"
             submit-label="Guardar cambios"
             @submit="handleUpdate"
@@ -242,7 +241,7 @@ import {
 } from "~/interfaces/purchaseOrderInterfaces"
 import { getUnitShortLabel } from "~/interfaces/productInterfaces"
 import { APP_ICONS } from "~/constants/appIcons"
-import { useAuthStore, usePurchaseOrdersStore, useSuppliersStore, useWarehousesStore } from "~/store"
+import { useAuthStore, usePurchaseOrdersStore, useWarehousesStore } from "~/store"
 import { formatDateTime, formatMoney, formatQuantity } from "~/helpers/formatHelpers"
 
 definePageMeta({ layout: "app" })
@@ -252,7 +251,6 @@ useHead({ title: "Orden de compra" })
 const route = useRoute()
 const authStore = useAuthStore()
 const ordersStore = usePurchaseOrdersStore()
-const suppliersStore = useSuppliersStore()
 const warehousesStore = useWarehousesStore()
 const { success } = useNotification()
 const { notifyError } = useApiNotification()
@@ -276,13 +274,6 @@ const status = computed(() => order.value?.status)
 const canEdit = computed(() => canManage.value && status.value === "DRAFT")
 const canReceive = computed(() => status.value === "ORDERED" || status.value === "PARTIALLY_RECEIVED")
 const canCancel = computed(() => canManage.value && canReceive.value)
-
-/** The supplier picker only lists active ones, but an inactive supplier already on the draft must stay selectable. */
-const editableSuppliers = computed(() => {
-  const active = suppliersStore.activeOptions
-  const current = suppliersStore.options.find((supplier) => supplier.id === order.value?.supplierId)
-  return current && !active.some((supplier) => supplier.id === current.id) ? [current, ...active] : active
-})
 
 const formatDateOnly = (value?: string | null) => {
   if (!value) return "—"
@@ -385,7 +376,6 @@ const handleDelete = async () => {
 }
 
 onMounted(() => {
-  suppliersStore.fetchOptions()
   warehousesStore.fetchOptions()
   load()
 })

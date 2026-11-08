@@ -34,16 +34,11 @@
           />
         </v-col>
         <v-col cols="12" sm="6">
-          <v-autocomplete
+          <RemoteSelect
             v-model="form.categoryId"
-            v-bind="autocomplete"
-            :items="categories"
-            item-title="name"
-            item-value="id"
+            kind="category"
             :label="fieldLabel('Categoría', requireCategory)"
-            :clearable="!requireCategory"
             :rules="requireCategory ? [rules.required] : []"
-            no-data-text="Sin categorías"
           />
         </v-col>
         <v-col cols="12" sm="6">
@@ -78,7 +73,7 @@
             min="0"
             step="any"
             prefix="S/"
-            :rules="[rules.required, rules.nonNegative, rules.maxDecimals(4)]"
+            :rules="[rules.required, rules.nonNegative, rules.maxDecimals(4), rules.maxIntegerDigits(8)]"
           />
         </v-col>
         <v-col cols="12" sm="6">
@@ -90,7 +85,7 @@
             min="0"
             step="any"
             prefix="S/"
-            :rules="[rules.required, rules.nonNegative, rules.maxDecimals(2)]"
+            :rules="[rules.required, rules.nonNegative, rules.maxDecimals(2), rules.maxIntegerDigits(10)]"
           />
         </v-col>
         <v-col cols="12">
@@ -114,7 +109,7 @@
             hint="Umbral para alertas de stock bajo"
             persistent-hint
             :suffix="unitShortLabel"
-            :rules="[rules.required, rules.nonNegative, rules.maxDecimals(3)]"
+            :rules="[rules.required, rules.nonNegative, rules.maxDecimals(3), rules.maxIntegerDigits(9)]"
           />
         </v-col>
         <v-col cols="12" sm="6" class="d-flex align-center">
@@ -155,7 +150,6 @@
 
 <script setup lang="ts">
 import type { CompanySettings } from "~/interfaces/companyInterfaces"
-import type { ProductCategory } from "~/interfaces/productCategoryInterfaces"
 import type { Product, ProductRequest, UnitOfMeasure } from "~/interfaces/productInterfaces"
 import { UNIT_OPTIONS, getUnitShortLabel } from "~/interfaces/productInterfaces"
 import { validationRules as rules } from "~/helpers/validationFormRules"
@@ -164,7 +158,6 @@ import { formatPercent } from "~/helpers/formatHelpers"
 const props = defineProps<{
   action: "create" | "update"
   product?: Product | null
-  categories: ProductCategory[]
   /** The company's "mandatory field" rules; when absent nothing is mandatory. */
   settings?: CompanySettings | null
 }>()

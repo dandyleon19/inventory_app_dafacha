@@ -28,7 +28,6 @@
         </v-overlay>
 
         <PurchaseOrderForm
-          :suppliers="suppliersStore.activeOptions"
           :warehouses="warehousesStore.activeOptions"
           submit-label="Crear orden (borrador)"
           @submit="handleSubmit"
@@ -41,7 +40,7 @@
 <script setup lang="ts">
 import type { PurchaseOrderRequest } from "~/interfaces/purchaseOrderInterfaces"
 import { APP_ICONS } from "~/constants/appIcons"
-import { usePurchaseOrdersStore, useSuppliersStore, useWarehousesStore } from "~/store"
+import { usePurchaseOrdersStore, useWarehousesStore } from "~/store"
 
 definePageMeta({
   layout: "app",
@@ -52,7 +51,6 @@ definePageMeta({
 useHead({ title: "Nueva orden de compra" })
 
 const ordersStore = usePurchaseOrdersStore()
-const suppliersStore = useSuppliersStore()
 const warehousesStore = useWarehousesStore()
 const { notifyError } = useApiNotification()
 
@@ -72,7 +70,6 @@ const handleSubmit = async (payload: PurchaseOrderRequest) => {
 }
 
 onMounted(() => {
-  suppliersStore.fetchOptions()
   warehousesStore.fetchOptions()
 })
 </script>

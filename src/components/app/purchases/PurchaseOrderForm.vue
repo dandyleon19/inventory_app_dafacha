@@ -8,15 +8,13 @@
     <AppFormSection title="Datos de la orden" subtitle="A quién se le compra y dónde se recibirá">
       <v-row dense>
         <v-col cols="12" md="6">
-          <v-autocomplete
+          <!-- Only active suppliers are offered; an inactive one already on the order still shows its name. -->
+          <RemoteSelect
             v-model="form.supplierId"
-            v-bind="autocomplete"
-            :items="suppliers"
-            item-title="name"
-            item-value="id"
+            kind="supplier"
             label="Proveedor"
+            :query="{ isActive: true }"
             :rules="[rules.required]"
-            no-data-text="No hay proveedores activos"
           />
         </v-col>
         <v-col cols="12" md="6">
@@ -199,7 +197,7 @@
                 min="0"
                 step="any"
                 prefix="S/"
-                :rules="[rules.required, rules.nonNegative, rules.maxDecimals(4)]"
+                :rules="[rules.required, rules.nonNegative, rules.maxDecimals(4), rules.maxIntegerDigits(8)]"
               />
               <v-text-field
                 v-else-if="line.priceMode === 'pack'"
@@ -271,7 +269,6 @@
 </template>
 
 <script setup lang="ts">
-import type { Supplier } from "~/interfaces/supplierInterfaces"
 import type { Warehouse } from "~/interfaces/warehouseInterfaces"
 import type { ProductOption } from "~/interfaces/productInterfaces"
 import type { PurchaseOrder, PurchaseOrderRequest } from "~/interfaces/purchaseOrderInterfaces"
@@ -284,7 +281,6 @@ const props = withDefaults(
   defineProps<{
     /** The order being edited; omit to create a new one. */
     order?: PurchaseOrder | null
-    suppliers: Supplier[]
     warehouses: Warehouse[]
     submitLabel?: string
   }>(),
@@ -466,6 +462,7 @@ const quantityRules = (line: LineForm) => [
   (v: number | string | null) => (v !== "" && v !== null) || "Este campo es requerido",
   (v: number | string | null) => Number(v) > 0 || "Debe ser mayor a 0",
   (v: number | string | null) => /^\d+(\.\d{1,3})?$/.test(String(v)) || "Máximo 3 decimales",
+  rules.maxIntegerDigits(11),
   (v: number | string | null) =>
     !(line.product && WHOLE_UNITS.includes(line.product.unit)) ||
     Number.isInteger(Number(v)) ||
@@ -519,10 +516,11 @@ const packPriceRules = [rules.required, rules.nonNegative, rules.maxDecimals(4)]
 
 /** What is wrong with a line as a whole, or null. */
 const lineIssue = (line: LineForm): string | null => {
-  if (unitsOf(line) <= 0) return "Indica al menos una unidad"
+  // Packages without a size add up to 0 units, so this has to come first or the user would be told the wrong thing.
   if (line.qtyMode === "packs" && num(line.packs) > 0 && num(line.packSize) <= 0) {
     return "Indica cuántas unidades trae cada paquete"
   }
+  if (unitsOf(line) <= 0) return "Indica al menos una unidad"
   if (line.priceMode === "pack" && num(line.packSize) <= 0) {
     return "Indica cuántas unidades trae el paquete para calcular el costo"
   }

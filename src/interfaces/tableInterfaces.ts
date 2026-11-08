@@ -14,11 +14,15 @@ export interface TableRowOption {
 }
 
 export interface FilterOption {
-    type: "select" | "searchable-select" | "multiselect" | "date"
+    type: "select" | "searchable-select" | "remote-select" | "multiselect" | "date"
     label: string
     key: string
     items: Array<any>
     multiple?: boolean
+    /** remote-select: what is listed, searched on the server and loaded 20 at a time. */
+    kind?: "supplier" | "category"
+    /** remote-select: extra filters sent to the server. */
+    query?: Record<string, string | number | boolean>
 }
 
 export interface TableChipColumn {

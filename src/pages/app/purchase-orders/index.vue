@@ -32,7 +32,7 @@ import {
   getPurchaseOrderStatusLabel,
 } from "~/interfaces/purchaseOrderInterfaces"
 import { APP_ICONS } from "~/constants/appIcons"
-import { useAuthStore, usePurchaseOrdersStore, useSuppliersStore } from "~/store"
+import { useAuthStore, usePurchaseOrdersStore } from "~/store"
 import { areTableSearchEqual, normalizeTableSearch } from "~/helpers/tableSearchHelpers"
 import { formatDateTime, formatMoney } from "~/helpers/formatHelpers"
 
@@ -42,7 +42,6 @@ useHead({ title: "Órdenes de compra" })
 
 const authStore = useAuthStore()
 const ordersStore = usePurchaseOrdersStore()
-const suppliersStore = useSuppliersStore()
 
 // Anyone can open an order (and receive goods); only admins create them.
 const canManage = computed(() => authStore.canManagePurchases)
@@ -82,12 +81,7 @@ const tableFilters = computed<FilterOption[]>(() => [
     key: "status",
     items: PURCHASE_ORDER_STATUS_OPTIONS,
   },
-  {
-    type: "searchable-select",
-    label: "Proveedor",
-    key: "supplierId",
-    items: suppliersStore.options.map((supplier) => ({ title: supplier.name, value: supplier.id })),
-  },
+  { type: "remote-select", kind: "supplier", label: "Proveedor", key: "supplierId", items: [] },
 ])
 
 /** "2026-10-02" -> "02/10/2026" without going through Date (which would shift the day by timezone). */
@@ -151,8 +145,6 @@ const handleRowActionButton = (order: PurchaseOrder, action: string) => {
 }
 
 onMounted(async () => {
-  suppliersStore.fetchOptions()
-
   // The table normally triggers the first load through its pagination event; this is only a fallback.
   await nextTick()
   if (!ordersStore.data && !ordersStore.loading) {

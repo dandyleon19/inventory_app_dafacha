@@ -1,10 +1,12 @@
 export const validationRules = {
+  // A text of only spaces counts as empty, like the backend's @NotBlank (otherwise the API would answer 400).
   required: (value: string | number | boolean | null | undefined) =>
-      (value !== null && value !== undefined && value !== '') ||
+      (value !== null && value !== undefined && (typeof value !== 'string' || value.trim() !== '')) ||
       "Este campo es requerido",
 
+  // Forms trim the email before sending it, so spaces around a pasted address are not a reason to refuse it.
   email: (value: string) =>
-      /^\S+@\S+\.\S+$/.test(value) ||
+      /^\S+@\S+\.\S+$/.test(String(value ?? '').trim()) ||
       "Correo inválido",
 
   number: (value: string | number) =>
@@ -23,6 +25,14 @@ export const validationRules = {
               value === null || value === undefined || value === '' ||
               new RegExp(`^-?\\d+(\\.\\d{1,${max}})?$`).test(String(value)) ||
               `Máximo ${max} decimales`,
+
+  /** At most `max` digits before the decimal point (the backend's @Digits(integer = ...) would answer 400). */
+  maxIntegerDigits:
+      (max: number) =>
+          (value: string | number | null | undefined) =>
+              value === null || value === undefined || value === '' ||
+              new RegExp(`^-?\\d{1,${max}}(\\.\\d*)?$`).test(String(value)) ||
+              `Máximo ${max} dígitos enteros`,
 
   maxLength:
       (max: number) =>

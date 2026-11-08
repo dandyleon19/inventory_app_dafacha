@@ -392,6 +392,7 @@ watch(
 const unitCostRules = [
   (v: number | string | null) => v === "" || v === null || Number(v) >= 0 || "No puede ser negativo",
   (v: number | string | null) => v === "" || v === null || /^\d+(\.\d{1,4})?$/.test(String(v)) || "Máximo 4 decimales",
+  rules.maxIntegerDigits(8),
 ]
 
 /** Local "today" as yyyy-mm-dd (toISOString would give the UTC day, which can be tomorrow in the evening). */
@@ -421,6 +422,7 @@ const quantityRules = computed(() => {
         ? Number(v) >= 0 || "Debe ser mayor o igual a 0"
         : Number(v) > 0 || "Debe ser mayor a 0",
     (v) => /^\d+(\.\d{1,3})?$/.test(String(v)) || "Máximo 3 decimales",
+    rules.maxIntegerDigits(11),
     (v) =>
       !(selectedProduct.value && WHOLE_UNITS.includes(selectedProduct.value.unit)) ||
       Number.isInteger(Number(v)) ||

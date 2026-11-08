@@ -33,7 +33,6 @@
     <ProductForm
       :action="formAction"
       :product="selectedProduct"
-      :categories="categoriesStore.options"
       :settings="companyStore.settings"
       @submit="handleSubmit"
     />
@@ -53,7 +52,7 @@ import type { FilterOption, TableChipColumn, TableHeader, TableRowOption } from 
 import type { Product, ProductRequest } from "~/interfaces/productInterfaces"
 import { getUnitShortLabel } from "~/interfaces/productInterfaces"
 import { APP_ICONS } from "~/constants/appIcons"
-import { useAuthStore, useCompanyStore, useProductCategoriesStore, useProductsStore } from "~/store"
+import { useAuthStore, useCompanyStore, useProductsStore } from "~/store"
 import { areTableSearchEqual, normalizeTableSearch } from "~/helpers/tableSearchHelpers"
 import { formatMoney, formatPercent } from "~/helpers/formatHelpers"
 
@@ -63,7 +62,6 @@ useHead({ title: "Productos" })
 
 const authStore = useAuthStore()
 const productsStore = useProductsStore()
-const categoriesStore = useProductCategoriesStore()
 const companyStore = useCompanyStore()
 const { notifyCreated, notifyUpdated, notifyDeleted, notifyError } = useApiNotification()
 
@@ -118,12 +116,7 @@ const chipColumns: TableChipColumn[] = [
 ]
 
 const tableFilters = computed<FilterOption[]>(() => [
-  {
-    type: "searchable-select",
-    label: "Categoría",
-    key: "categoryId",
-    items: categoriesStore.options.map((category) => ({ title: category.name, value: category.id })),
-  },
+  { type: "remote-select", kind: "category", label: "Categoría", key: "categoryId", items: [] },
   {
     type: "select",
     label: "Estado",
@@ -240,7 +233,6 @@ const handleDelete = async () => {
 }
 
 onMounted(async () => {
-  categoriesStore.fetchOptions()
   companyStore.fetchSettings()
 
   // The table normally triggers the first load through its pagination event; this is only a fallback.

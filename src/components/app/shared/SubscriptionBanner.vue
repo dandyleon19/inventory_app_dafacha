@@ -114,7 +114,7 @@ const supportLink = computed(() => {
   const phone = String(config.public.supportWhatsapp ?? "").replace(/\D/g, "")
   if (!phone) return ""
   const company = authStore.user?.companyName ? ` (${authStore.user.companyName})` : ""
-  return `https://wa.me/${phone}?text=${encodeURIComponent(`Hola, quiero renovar mi plan de CompanySpa${company}.`)}`
+  return `https://wa.me/${phone}?text=${encodeURIComponent(`Hola, quiero renovar mi plan de DF Inventory${company}.`)}`
 })
 </script>
 

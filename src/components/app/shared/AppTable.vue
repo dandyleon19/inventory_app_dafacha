@@ -61,8 +61,22 @@
                     />
 
                     <template v-for="filter in filters" :key="filter.key">
+                        <RemoteSelect
+                            v-if="filter.type === 'remote-select' && filter.kind"
+                            v-model="selectedFilters[filter.key]"
+                            :kind="filter.kind"
+                            :label="filter.label"
+                            :query="filter.query"
+                            hide-details
+                            density="comfortable"
+                            variant="solo-filled"
+                            flat
+                            rounded="lg"
+                            class="app-table__filter"
+                        />
+
                         <v-select
-                            v-if="filter.type === 'select'"
+                            v-else-if="filter.type === 'select'"
                             v-model="selectedFilters[filter.key]"
                             :label="filter.label"
                             :items="filter.items"

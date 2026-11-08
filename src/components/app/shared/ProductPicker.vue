@@ -13,7 +13,12 @@
     placeholder="Busca por nombre, SKU o código de barras"
     @update:model-value="onModelValue"
     @update:search="onSearch"
-  />
+  >
+    <!-- Scrolling to the end of the list asks for the next page. -->
+    <template v-if="hasMore" #append-item>
+      <InfiniteSentinel :key="items.length" @visible="loadMore" />
+    </template>
+  </v-autocomplete>
 </template>
 
 <script setup lang="ts">
@@ -66,7 +71,11 @@ const toItem = (product: ProductOption): Item => ({
 const known = new Map<number, Item>()
 const items = ref<Item[]>([])
 const searching = ref(false)
+const hasMore = ref(false)
 let searchTimer: ReturnType<typeof setTimeout> | null = null
+let currentTerm = ""
+let currentPage = 0
+let requestId = 0
 
 if (props.initial) {
   const item = toItem(props.initial)
@@ -74,26 +83,39 @@ if (props.initial) {
   items.value = [item]
 }
 
+const requestPage = (page: number, term: string) => {
+  const { $api } = useNuxtApp()
+  return $api<PageResponse<Product>>("/api/products", {
+    method: "GET",
+    query: { page, size: 20, isActive: true, ...(term ? { search: term } : {}) },
+  })
+}
+
+const toItems = (products: Product[]) =>
+  products.map((p) =>
+    toItem({
+      id: p.id!,
+      name: p.name,
+      sku: p.sku,
+      unit: p.unit,
+      costPrice: p.costPrice,
+      tracksExpiry: p.tracksExpiry,
+    })
+  )
+
+/** First page of a (new) search: replaces the list. */
 const load = async (term: string) => {
+  const id = ++requestId
+  currentTerm = term
+  currentPage = 0
   searching.value = true
   try {
-    const { $api } = useNuxtApp()
-    const res = await $api<PageResponse<Product>>("/api/products", {
-      method: "GET",
-      query: { page: 0, size: 20, isActive: true, ...(term ? { search: term } : {}) },
-    })
+    const res = await requestPage(0, term)
+    if (id !== requestId) return // a newer search took over
 
-    const found = (res.content ?? []).map((p) =>
-      toItem({
-        id: p.id!,
-        name: p.name,
-        sku: p.sku,
-        unit: p.unit,
-        costPrice: p.costPrice,
-        tracksExpiry: p.tracksExpiry,
-      })
-    )
+    const found = toItems(res.content ?? [])
     found.forEach((item) => known.set(item.id, item))
+    hasMore.value = currentPage + 1 < (res.totalPages ?? 1)
 
     // Keep the current selection in the list even when it isn't in this result page.
     const selected = props.modelValue ? known.get(props.modelValue) : undefined
@@ -101,9 +123,35 @@ const load = async (term: string) => {
   } catch (err) {
     console.error("Error al buscar productos:", err)
   } finally {
-    searching.value = false
+    if (id === requestId) searching.value = false
   }
 }
+
+/** Next 20 of the same search: appended to the list when the user scrolls to the end. */
+const loadMore = async () => {
+  if (searching.value || !hasMore.value) return
+
+  const id = ++requestId
+  searching.value = true
+  try {
+    const res = await requestPage(currentPage + 1, currentTerm)
+    if (id !== requestId) return
+
+    currentPage += 1
+    const found = toItems(res.content ?? [])
+    found.forEach((item) => known.set(item.id, item))
+    hasMore.value = currentPage + 1 < (res.totalPages ?? 1)
+
+    const already = new Set(items.value.map((item) => item.id))
+    items.value = [...items.value, ...found.filter((item) => !already.has(item.id))]
+  } catch (err) {
+    console.error("Error al cargar más productos:", err)
+  } finally {
+    if (id === requestId) searching.value = false
+  }
+}
+
+defineExpose({ loadMore })
 
 const onSearch = (term: string) => {
   // The autocomplete echoes the selected label as its search text: that isn't a new search.
