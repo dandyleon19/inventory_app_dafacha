@@ -17,7 +17,12 @@ const supplier = {
   isActive: true,
 }
 
-beforeEach(() => {
+beforeEach(async () => {
+  // A wide screen: the table (with its "Acciones" column), not the cards of a phone or an iPad held upright.
+  ;(window as any).innerWidth = 1280
+  window.dispatchEvent(new Event("resize"))
+  await new Promise((resolve) => setTimeout(resolve, 200))
+
   const suppliers = useSuppliersStore()
   vi.spyOn(suppliers, "fetchSuppliers").mockImplementation(async () => {
     suppliers.data = { content: [supplier], page: 0, size: 10, totalElements: 1, totalPages: 1 } as any

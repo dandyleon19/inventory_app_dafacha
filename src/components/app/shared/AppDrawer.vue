@@ -139,6 +139,18 @@ const close = () => {
 }
 </script>
 
+<style>
+/* The form panel always sits on top of the menu (a permanent menu would otherwise cover its left edge) and its dark veil
+   covers the menu too. Vuetify gives the menu 1008 and a drawer that opens over the page 1004. */
+.app-form-drawer {
+  z-index: 1010 !important;
+}
+
+.app-form-drawer + .v-navigation-drawer__scrim {
+  z-index: 1009 !important;
+}
+</style>
+
 <style scoped>
 .app-form-drawer__header {
   gap: 12px;

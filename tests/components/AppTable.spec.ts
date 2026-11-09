@@ -1,4 +1,4 @@
-import { afterEach, describe, expect, it } from "vitest"
+import { afterEach, beforeEach, describe, expect, it } from "vitest"
 import { h } from "vue"
 import { flushPromises } from "@vue/test-utils"
 import { mountSuspended } from "@nuxt/test-utils/runtime"
@@ -95,12 +95,17 @@ const cards = (wrapper: any) => wrapper.findAll(".app-card")
 
 afterEach(async () => {
   opened.splice(0).forEach((wrapper) => wrapper.unmount())
-  await setViewportWidth(1024)
+  await setViewportWidth(1280)
 })
 
 const menuText = () => document.body.querySelector(".app-table__menu-list")?.textContent ?? ""
 
 describe("AppTable on a wide screen", () => {
+  // jsdom starts at 1024px, which is a tablet held upright for the app: a wide screen is 1280px.
+  beforeEach(async () => {
+    await setViewportWidth(1280)
+  })
+
   it("is a table, not cards", async () => {
     const wrapper = await mountTable(five)
     expect(cards(wrapper)).toHaveLength(0)
@@ -174,6 +179,22 @@ describe("AppTable on a wide screen", () => {
 })
 
 describe("AppTable on a phone or a tablet", () => {
+  it.each([390, 768, 834, 1024, 1099])("shows cards at %ipx wide (a phone or an iPad held upright, or a small tablet)", async (width) => {
+    await setViewportWidth(width)
+    const wrapper = await mountTable(five)
+
+    expect(cards(wrapper)).toHaveLength(1)
+    expect(wrapper.find("thead").exists()).toBe(false)
+  })
+
+  it.each([1133, 1280, 1920])("keeps the table at %ipx wide (a tablet held sideways or a computer)", async (width) => {
+    await setViewportWidth(width)
+    const wrapper = await mountTable(five)
+
+    expect(cards(wrapper)).toHaveLength(0)
+    expect(wrapper.find("thead").exists()).toBe(true)
+  })
+
   it("shows each row as a card, without the table header", async () => {
     await setViewportWidth(500)
     const wrapper = await mountTable(five)

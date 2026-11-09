@@ -476,7 +476,7 @@
 
 <script setup lang="ts">
 import { ref, useSlots, computed, watch, onMounted, onBeforeUnmount, nextTick } from "vue";
-import { useDisplay } from "vuetify";
+import { useCompactViewport } from "~/composables/useAppLayout";
 import AppTableWrapper from "~/components/app/shared/AppTableWrapper.vue";
 import type { TableHeader, FilterOption, TableRowOption, TableChipColumn } from "~/interfaces/tableInterfaces";
 import { normalizeTableSearch } from "~/helpers/tableSearchHelpers";
@@ -586,8 +586,7 @@ const resolveRowOptions = (item: Record<string, unknown>) =>
     props.getRowOptions ? props.getRowOptions(item) : props.rowOptions
 
 // Phones and tablets (the same width where the sidebar turns into a drawer) get a list of cards instead of the table.
-const display = useDisplay()
-const isCompact = computed(() => display.mdAndDown.value)
+const isCompact = useCompactViewport()
 
 // A row (or a card) with more than three actions keeps the primary ones (the flagged ones, or else the first two) and
 // the others go behind a "more" button: a sheet on phones and tablets, a menu on wide screens. The flagged actions
