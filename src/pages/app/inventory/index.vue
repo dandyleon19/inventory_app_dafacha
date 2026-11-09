@@ -177,8 +177,8 @@ const operationButtons = computed(() => [
 ])
 
 const headers: TableHeader[] = [
-  { title: "SKU", key: "sku" },
-  { title: "Producto", key: "productName" },
+  { title: "SKU", key: "sku", card: "subtitle" },
+  { title: "Producto", key: "productName", card: "title" },
   { title: "Stock", key: "quantityLabel" },
   { title: "Mínimo", key: "minStockLabel" },
   { title: "Estado", key: "statusLabel" },
@@ -200,8 +200,8 @@ const chipColumns: TableChipColumn[] = [
 const rowOptions = computed<TableRowOption[]>(() => [
   ...(canOperate.value
     ? [
-        { action: "entry", title: "Registrar ingreso", color: "success", icon: APP_ICONS.entry },
-        { action: "exit", title: "Registrar salida", color: "error", icon: APP_ICONS.exit },
+        { action: "entry", title: "Registrar ingreso", color: "success", icon: APP_ICONS.entry, primary: true },
+        { action: "exit", title: "Registrar salida", color: "error", icon: APP_ICONS.exit, primary: true },
         { action: "transfer", title: "Transferir", color: "primary", icon: APP_ICONS.transfer },
       ]
     : []),

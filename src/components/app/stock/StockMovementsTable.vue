@@ -76,8 +76,8 @@ const isReceiptsView = computed(() => !!props.receiptsOnly && !isOrderView.value
 const headers = computed<TableHeader[]>(() => {
   if (isOrderView.value) {
     return [
-      { title: "Fecha", key: "createdAtLabel" },
-      { title: "Producto", key: "productLabel" },
+      { title: "Fecha", key: "createdAtLabel", card: "subtitle" },
+      { title: "Producto", key: "productLabel", card: "title" },
       { title: "Lote / vence", key: "lotLabel" },
       { title: "Recibido", key: "quantity" },
       { title: "Costo unit.", key: "unitCostLabel" },
@@ -88,10 +88,10 @@ const headers = computed<TableHeader[]>(() => {
 
   if (isReceiptsView.value) {
     return [
-      { title: "Fecha", key: "createdAtLabel" },
+      { title: "Fecha", key: "createdAtLabel", card: "subtitle" },
       { title: "Orden", key: "purchaseOrderNumber" },
       { title: "Proveedor", key: "supplierName" },
-      { title: "Producto", key: "productLabel" },
+      { title: "Producto", key: "productLabel", card: "title" },
       { title: "Almacén", key: "warehouseName" },
       { title: "Lote / vence", key: "lotLabel" },
       { title: "Recibido", key: "quantity" },
@@ -101,9 +101,9 @@ const headers = computed<TableHeader[]>(() => {
   }
 
   return [
-    { title: "Fecha", key: "createdAtLabel" },
+    { title: "Fecha", key: "createdAtLabel", card: "subtitle" },
     { title: "Tipo", key: "typeLabel" },
-    ...(props.hideProductColumn ? [] : [{ title: "Producto", key: "productLabel" }]),
+    ...(props.hideProductColumn ? [] : [{ title: "Producto", key: "productLabel", card: "title" as const }]),
     { title: "Almacén", key: "warehouseName" },
     { title: "Lote / vence", key: "lotLabel" },
     { title: "Cantidad", key: "quantity" },

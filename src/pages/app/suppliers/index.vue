@@ -79,7 +79,7 @@ const activeSearch = ref("")
 const headers = computed<TableHeader[]>(() => [
   { title: "#", key: "id" },
   { title: "Proveedor", key: "name" },
-  { title: "RUC", key: "rucNumber" },
+  { title: "RUC", key: "rucNumber", card: "subtitle" },
   { title: "Contacto", key: "contactName" },
   { title: "Teléfono", key: "phone" },
   { title: "Correo", key: "email" },

@@ -39,7 +39,7 @@ interface RemoteRecord {
 
 const props = withDefaults(
   defineProps<{
-    modelValue: number | string | null
+    modelValue?: number | string | null
     kind: Kind
     label?: string
     /** Extra filters sent with every request, e.g. `{ isActive: true }`. */
@@ -48,7 +48,7 @@ const props = withDefaults(
     /** A disabled select does not list anything: it only shows the record it holds. */
     disabled?: boolean
   }>(),
-  { label: "", query: () => ({}), rules: () => [], disabled: false }
+  { modelValue: null, label: "", query: () => ({}), rules: () => [], disabled: false }
 )
 
 const emit = defineEmits<{

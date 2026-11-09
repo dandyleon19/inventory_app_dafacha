@@ -86,7 +86,7 @@ const activeFilters = reactive<{ role?: UserRole; isActive?: boolean; companyId?
 // The platform owner sees the users of every company, so for them the list says which company each one is from.
 const headers = computed<TableHeader[]>(() => [
   { title: "Usuario", key: "fullName" },
-  { title: "Correo", key: "email" },
+  { title: "Correo", key: "email", card: "subtitle" },
   ...(authStore.isSuperAdmin ? [{ title: "Empresa", key: "companyLabel" }] : []),
   { title: "Rol", key: "roleLabel" },
   { title: "Almacenes", key: "warehousesLabel" },

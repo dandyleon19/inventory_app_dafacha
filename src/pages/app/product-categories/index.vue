@@ -74,7 +74,7 @@ const activeSearch = ref("")
 const headers: TableHeader[] = [
   { title: "#", key: "id" },
   { title: "Nombre", key: "name" },
-  { title: "Descripción", key: "description" },
+  { title: "Descripción", key: "description", card: "subtitle" },
   { title: "Acciones", key: "actions", sortable: false },
 ]
 

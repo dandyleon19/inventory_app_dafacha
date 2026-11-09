@@ -53,7 +53,7 @@ const activeFilters = reactive<{ status?: PurchaseOrderStatus; supplierId?: numb
 
 const headers: TableHeader[] = [
   { title: "Orden", key: "number" },
-  { title: "Proveedor", key: "supplierName" },
+  { title: "Proveedor", key: "supplierName", card: "subtitle" },
   { title: "Almacén destino", key: "warehouseName" },
   { title: "Estado", key: "statusLabel" },
   { title: "Líneas", key: "lineCount" },

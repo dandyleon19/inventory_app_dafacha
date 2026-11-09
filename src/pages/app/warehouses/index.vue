@@ -82,7 +82,7 @@ const headers = computed<TableHeader[]>(() => [
   { title: "#", key: "id" },
   ...(authStore.isSuperAdmin ? [{ title: "Empresa", key: "companyLabel" }] : []),
   { title: "Nombre", key: "name" },
-  { title: "Dirección", key: "address" },
+  { title: "Dirección", key: "address", card: "subtitle" },
   { title: "Estado", key: "statusLabel" },
   { title: "Acciones", key: "actions", sortable: false },
 ])

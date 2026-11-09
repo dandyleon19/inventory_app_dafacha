@@ -54,7 +54,7 @@ const alertDays = computed(() => dashboardStore.summary?.expiryAlertDays ?? 30)
 const headers: TableHeader[] = [
   { title: "Producto", key: "productLabel" },
   { title: "Almacén", key: "warehouseName" },
-  { title: "Lote", key: "lotLabel" },
+  { title: "Lote", key: "lotLabel", card: "subtitle" },
   { title: "Vence", key: "expiryLabel" },
   { title: "Estado", key: "statusLabel" },
   { title: "Cantidad", key: "quantityLabel" },

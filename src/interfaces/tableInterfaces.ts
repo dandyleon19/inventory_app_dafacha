@@ -3,6 +3,15 @@ export interface TableHeader {
     key: string
     sortable?: boolean
     class?: string
+    /**
+     * Phones and tablets show each row as a card. `title` and `subtitle` are the heading lines (several `title`
+     * columns are joined, e.g. first name and last name), `hidden` leaves the column out; the rest are listed under
+     * their header. `join` writes the value next to the previous column ("4 Jul, 2026 · 9:00 AM"). Without any
+     * `title` the first plain column is the title.
+     */
+    card?: "title" | "subtitle" | "hidden" | "join"
+    /** Only in the cards of phones and tablets, not a column of the table. */
+    cardOnly?: boolean
 }
 
 export interface TableRowOption {
@@ -11,6 +20,8 @@ export interface TableRowOption {
     action: string
     color: string
     class?: string
+    /** A row with many actions keeps the primary ones visible and moves the rest behind a "more" button. */
+    primary?: boolean
 }
 
 export interface FilterOption {

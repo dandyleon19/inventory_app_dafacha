@@ -130,7 +130,7 @@ const activeSearch = ref("")
 const headers: TableHeader[] = [
   { title: "#", key: "id" },
   { title: "Empresa", key: "name" },
-  { title: "RUC", key: "rucNumber" },
+  { title: "RUC", key: "rucNumber", card: "subtitle" },
   { title: "Teléfono", key: "phone" },
   { title: "Plan", key: "planName" },
   { title: "Estado", key: "subscriptionStatusLabel" },

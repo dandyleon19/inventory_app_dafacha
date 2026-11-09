@@ -82,8 +82,8 @@ const activeFilters = reactive<{ categoryId?: number; isActive?: boolean }>({})
 
 const headers = computed<TableHeader[]>(() => [
   { title: "#", key: "id" },
-  { title: "SKU", key: "sku" },
-  { title: "Producto", key: "name" },
+  { title: "SKU", key: "sku", card: "subtitle" },
+  { title: "Producto", key: "name", card: "title" },
   { title: "Categoría", key: "categoryName" },
   { title: "Unidad", key: "unitLabel" },
   { title: "Costo", key: "costPriceLabel" },

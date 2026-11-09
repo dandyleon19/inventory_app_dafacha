@@ -66,11 +66,11 @@ const activeFilters = reactive<{
 
 // "Detalle" is last on purpose: the last column isn't width-capped, so the change lines have room.
 const headers: TableHeader[] = [
-  { title: "Fecha", key: "createdAtLabel" },
-  { title: "Usuario", key: "userName" },
+  { title: "Fecha", key: "createdAtLabel", card: "subtitle" },
+  { title: "Usuario", key: "userName", card: "subtitle" },
   { title: "Acción", key: "actionLabel" },
   { title: "Sobre", key: "entityLabelText" },
-  { title: "Elemento", key: "entityName" },
+  { title: "Elemento", key: "entityName", card: "title" },
   { title: "Detalle", key: "details" },
 ]
 
