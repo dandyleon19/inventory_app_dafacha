@@ -92,7 +92,9 @@ const go = (to: string) => {
   padding-bottom: env(safe-area-inset-bottom, 0px);
 }
 
-.app-bottom-nav__btn {
+/* Vuetify gives every button of the bar a minimum width of 80px: with five or six items that is wider than a phone, so the
+   first and the last would fall off the screen. They share the width instead. */
+.app-bottom-nav :deep(.app-bottom-nav__btn.v-btn) {
   min-width: 0;
   padding-inline: 2px;
   border-radius: 16px;
